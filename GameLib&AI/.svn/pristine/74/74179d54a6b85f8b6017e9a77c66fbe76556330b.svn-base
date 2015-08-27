@@ -1,0 +1,39 @@
+#pragma once
+#include "..\PhysicsGui\include\PhysicsGui\GuiBase.h"
+#include "..\PhysicsGui\include\PhysicsGui\VectorGraphic.h"
+#include "Particle.h"
+#include "ParticleSpring.h"
+#include "ParticleGravity.h"
+#include "ParticleForceRegistry.h"
+#include "DebugSlider.h"
+#include "Qt\qcheckbox.h"
+class MultiSpringForces : public GuiBase
+{
+	Particle p1;
+	Particle p2;
+	Particle p3;
+	Particle p4;
+	Particle p5;
+	Particle p6;
+	VectorGraphic* g1;
+	VectorGraphic* g2;
+	VectorGraphic* g3;
+	VectorGraphic* g4;
+	VectorGraphic* g5;
+	VectorGraphic* g6;
+	ParticleGravity pg;
+	ParticleSpring ps1;
+	ParticleSpring ps2;
+	ParticleSpring ps3;
+	ParticleSpring ps4;
+	ParticleSpring ps5;
+	ParticleForceRegistry pfr;
+	
+public:
+	MultiSpringForces();
+	MultiSpringForces(DebugSlider& SpringConst,DebugSlider& rest,DebugSlider& drag,QCheckBox& gravity);
+	void initialize();
+	void vectorGraphicMouseDrag(uint vectorGraphicIndex,const glm::vec3& dragDelta);
+	void newFrame();
+};
+

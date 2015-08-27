@@ -1,0 +1,313 @@
+#include <GL\glew.h>
+#include <QtGui\qmouseevent>
+#include "GlWindow.h"
+#include "Qt\qdebug.h"
+#include "glm\glm.hpp"
+#include <glm\gtc/matrix_transform.hpp>
+#include "glm\gtx\transform.hpp"
+#include <ShapeGenerator.h>
+#include <fstream>
+#include <string>
+#include "Renderer.h"
+#include <glm/gtc/random.hpp>
+#include "Camera.h"
+Camera cam;
+using glm::vec3;
+using glm::vec2;
+float angle=0.0f;
+float angley=0.0f;
+int delay = 0;
+float timer=0.0f;
+Renderer shapes;
+static Renderer::GeometryInfo* geometries[10];
+static Renderer::ShaderInfo* shaders[10];
+static Renderer::RenderableInfo* renderables[20];
+glm::vec3 ShapeColor;
+glm::vec3 ambientlight;
+glm::vec3 difuseLight;
+glm::vec3 lightPosition(0.0f,1.0f,-8.0f);
+glm::vec3 dominatingColor;
+glm::vec3 specColor;
+glm::vec3 camPos;
+glm::vec4 color=glm::vec4(glm::linearRand(glm::vec2(0), glm::vec2(1)),glm::linearRand(glm::vec2(0), glm::vec2(1)));
+float Powerofspectralness;
+glm::mat3 Normal;
+glm::mat4 transformCube1;
+glm::mat4 transformTorus1;
+glm::mat4 transformTorus2;
+glm::mat4 transformShpere1;
+glm::mat4 transformShpere2;
+glm::mat4 transformArrow;
+glm::mat4 transformPlane;
+GlWindow::GlWindow(DebugSlider &sARed,DebugSlider &sAGreen,DebugSlider &sABlue,
+			DebugSlider &sDRed,DebugSlider &sDGreen,DebugSlider &sDBlue,
+			DebugSlider &sSRed,DebugSlider &sSGreen,DebugSlider &sSBlue,
+			DebugSlider &Sx,DebugSlider &Sy,DebugSlider &Sz,DebugSlider &SP)
+{
+	ARed=&sARed;
+	AGreen=&sAGreen;
+	ABlue=&sABlue;
+	DRed=&sDRed;
+	DGreen=&sDGreen;
+	DBlue=&sDBlue;
+	SRed=&sSRed;
+	SGreen=&sSGreen;
+	SBlue=&sSBlue;
+	SLx=&Sx;
+	SLy=&Sy;
+	SLz=&Sz;
+	SLpow=&SP;
+}
+void GlWindow::initializeGL()
+{
+	setMouseTracking(true);
+	glewInit();
+	shapes.initializeRenderer();
+	glEnable(GL_DEPTH_TEST);
+	sendDataToHardware();
+	connect(&mytimer,SIGNAL(timeout()),this,SLOT(myUpdate()));
+	cam.position=glm::vec3(0.0f,5.0f,0.0f);
+	mytimer.start(0);
+}
+void GlWindow::myUpdate()
+{
+	QCursor mouse = cursor();
+	QPoint mousePosition = mouse.pos();
+	
+
+	
+	
+	if(GetAsyncKeyState('W'))
+	{
+		cam.moveForward();
+	}
+	if(GetAsyncKeyState('S'))
+	{
+		cam.moveBackward();
+	}
+	if(GetAsyncKeyState('A'))
+	{
+		cam.strafeLeft();
+	}
+	if(GetAsyncKeyState('D'))
+	{
+		cam.strafeRight();
+	}
+	if(GetAsyncKeyState('R'))
+	{
+		cam.moveUp();
+	}
+	if(GetAsyncKeyState('F'))
+	{
+		cam.moveDown();
+	}
+
+	if(GetAsyncKeyState('O'))
+	{
+		lightPosition[1]+=0.1f;
+	}
+	if(GetAsyncKeyState('U'))
+	{
+		lightPosition[1]-=0.1f;
+	}
+	if(GetAsyncKeyState('L'))
+	{
+		lightPosition[0]+=0.1f;
+	}
+	if(GetAsyncKeyState('J'))
+	{
+		lightPosition[0]-=0.1f;
+	}
+	if(GetAsyncKeyState('K'))
+	{
+		lightPosition[2]+=0.1f;
+	}
+	if(GetAsyncKeyState('I'))
+	{
+		lightPosition[2]-=0.1f;
+	}
+	cam.mouseUpdate(glm::vec2(mousePosition.x(),mousePosition.y()));
+	paintGL();
+	swapBuffers();
+}
+void GlWindow::sendDataToHardware()
+{
+    Neumont::ShapeData cube= Neumont::ShapeGenerator::makeCube();
+	Neumont::ShapeData Torus= Neumont::ShapeGenerator::makeTorus(120);
+	Neumont::ShapeData Sphere= Neumont::ShapeGenerator::makeSphere(10);
+	Neumont::ShapeData Arrow= Neumont::ShapeGenerator::makeArrow();
+	Neumont::ShapeData plane= Neumont::ShapeGenerator::makePlane(25);
+
+	geometries[0]=shapes.addGeometry(cube.verts,cube.vertexBufferSize(),cube.indices,cube.numIndices,GL_TRIANGLES);
+	shaders[0]=shapes.createShaderInfo("VertexShaderCode.glsl","FragmentShaderCode.glsl");
+	//shaders[1]=shapes.createShaderInfo("passThroughVertexShader.glsl","passThroughFragmentShader.glsl");
+	shapes.addShaderStreamedParameter(geometries[0],0,Renderer::PT_VEC3,0,12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[0],1,Renderer::PT_VEC4,geometries[0]->BufferOffset+3*sizeof(float),12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[0],2,Renderer::PT_VEC3,geometries[0]->BufferOffset+7*sizeof(float),12*sizeof(float));
+	renderables[0]=shapes.addRenderable(geometries[0],transformCube1,shaders[0]);
+	
+	geometries[1]=shapes.addGeometry(Torus.verts,Torus.vertexBufferSize(),Torus.indices,Torus.numIndices,GL_TRIANGLES);
+	shapes.addShaderStreamedParameter(geometries[1],0,Renderer::PT_VEC3,geometries[1]->BufferOffset,12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[1],1,Renderer::PT_VEC4,geometries[1]->BufferOffset+3*sizeof(float),12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[1],2,Renderer::PT_VEC3,geometries[1]->BufferOffset+7*sizeof(float),12*sizeof(float));
+	renderables[1]=shapes.addRenderable(geometries[1],transformTorus1,shaders[0]);
+	renderables[2]=shapes.addRenderable(geometries[1],transformTorus2,shaders[0]);
+
+	geometries[2]=shapes.addGeometry(Sphere.verts,Sphere.vertexBufferSize(),Sphere.indices,Sphere.numIndices,GL_TRIANGLES);
+	shapes.addShaderStreamedParameter(geometries[2],0,Renderer::PT_VEC3,geometries[2]->BufferOffset,12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[2],1,Renderer::PT_VEC4,geometries[2]->BufferOffset+3*sizeof(float),12*sizeof(float));
+ 	shapes.addShaderStreamedParameter(geometries[2],2,Renderer::PT_VEC3,geometries[2]->BufferOffset+7*sizeof(float),12*sizeof(float));
+	renderables[3]=shapes.addRenderable(geometries[2],transformShpere1,shaders[0]);
+	renderables[4]=shapes.addRenderable(geometries[2],transformShpere2,shaders[0]);
+
+	geometries[3]=shapes.addGeometry(Arrow.verts,Arrow.vertexBufferSize(),Arrow.indices,Arrow.numIndices,GL_TRIANGLES);
+	shapes.addShaderStreamedParameter(geometries[3],0,Renderer::PT_VEC3,geometries[3]->BufferOffset,12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[3],1,Renderer::PT_VEC4,geometries[3]->BufferOffset+3*sizeof(float),12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[3],2,Renderer::PT_VEC3,geometries[3]->BufferOffset+7*sizeof(float),12*sizeof(float));
+	renderables[5]=shapes.addRenderable(geometries[3],transformArrow,shaders[0]);
+
+	geometries[4]=shapes.addGeometry(plane.verts,plane.vertexBufferSize(),plane.indices,plane.numIndices,GL_TRIANGLES);
+	shapes.addShaderStreamedParameter(geometries[4],0,Renderer::PT_VEC3,geometries[4]->BufferOffset,12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[4],1,Renderer::PT_VEC4,geometries[4]->BufferOffset+3*sizeof(float),12*sizeof(float));
+	shapes.addShaderStreamedParameter(geometries[4],2,Renderer::PT_VEC3,geometries[4]->BufferOffset+7*sizeof(float),12*sizeof(float));
+	renderables[6]=shapes.addRenderable(geometries[4],transformPlane,shaders[0]);
+
+
+	
+}
+
+void GlWindow::paintGL()
+{
+	glViewport(0,0,width(),height());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+	timer-=1.0f;
+	transformCube1=glm::scale(glm::translate(glm::mat4(),lightPosition),glm::vec3(0.1f,0.1f,0.1f));
+	transformTorus1=glm::translate(glm::mat4(),glm::vec3(2.0f,2.0f,0.0f));
+    transformTorus2=glm::translate(glm::mat4(),glm::vec3(-2.0f,2.0f,0.0f));
+	transformShpere1=glm::translate(glm::mat4(),glm::vec3(2.0f,0.0f,0.0f));
+	transformShpere2=glm::translate(glm::mat4(),glm::vec3(-2.0f,0.0f,0.0f));
+	transformArrow=glm::translate(glm::mat4(),glm::vec3(0.0f,-2.0f,0.0f));
+	transformPlane=glm::translate(glm::mat4(),glm::vec3(0.0f,-1.0f,0.0f));
+	glm::mat4 worldmat=cam.getWorldToViewMatrix();
+	glm::mat4 projection= glm::perspective(90.0f,((float)width()) / height(),0.1f,100.0f);
+	glm::mat4 finalmat=transformCube1;
+	//dominatingColor=glm::vec3(SRed->value(),SGreen->value(),SBlue->value());
+	if(timer<=0.0f)
+	{
+	color=glm::vec4(glm::linearRand(glm::vec2(0), glm::vec2(1)),glm::linearRand(glm::vec2(0), glm::vec2(1)));
+	timer=1.0f;
+	}
+	dominatingColor=glm::vec3(color);
+	ambientlight=glm::vec3(ARed->value(),AGreen->value(),ABlue->value());
+	difuseLight=glm::vec3(DRed->value(),DGreen->value(),DBlue->value());
+	specColor=glm::vec3(SLx->value(),SLy->value(),SLz->value());
+	Powerofspectralness=(SLpow->value());
+	camPos=glm::vec3(cam.position);
+
+
+	shapes.addRenderableUniformParameter(renderables[0],"dominatingColor",Renderer::PT_VEC3,&dominatingColor[0]);
+	shapes.addRenderableUniformParameter(renderables[0],"lightPos",Renderer::PT_VEC3,&lightPosition[0]);
+	shapes.addRenderableUniformParameter(renderables[0],"lightPos",Renderer::PT_VEC3,&lightPosition[0]);
+	shapes.addRenderableUniformParameter(renderables[0],"transform",Renderer::PT_MAT4,&finalmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[0],"world",Renderer::PT_MAT4,&worldmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[0],"projectionMat",Renderer::PT_MAT4,&projection[0][0]);
+	shapes.addRenderableUniformParameter(renderables[0],"ambientLight",Renderer::PT_VEC3,&ambientlight[0]);
+	shapes.addRenderableUniformParameter(renderables[0],"Speclight",Renderer::PT_VEC3,&specColor[0]);
+	shapes.addRenderableUniformParameter(renderables[0],"camPos",Renderer::PT_VEC3,&camPos[0]);
+	shapes.addRenderableUniformParameter(renderables[0],"Power",Renderer::PT_FLOAT,&Powerofspectralness);
+	shapes.addRenderableUniformParameter(renderables[0],"diffuseColor",Renderer::PT_VEC3,&difuseLight[0]);
+	shapes.addRenderableUniformParameter(renderables[0],"normalMat",Renderer::PT_MAT3,&Normal[0][0]);
+	glBindVertexArray(geometries[0]->vertexArrayID);
+	glDrawElements(geometries[0]->indexingMode,geometries[0]->numIndices,GL_UNSIGNED_SHORT,(void*)geometries[0]->geometryoffset);
+	
+	finalmat=transformTorus1;
+	shapes.addRenderableUniformParameter(renderables[1],"dominatingColor",Renderer::PT_VEC3,&dominatingColor[0]);
+	shapes.addRenderableUniformParameter(renderables[1],"lightPos",Renderer::PT_VEC3,&lightPosition[0]);
+	shapes.addRenderableUniformParameter(renderables[1],"transform",Renderer::PT_MAT4,&finalmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[1],"world",Renderer::PT_MAT4,&worldmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[1],"projectionMat",Renderer::PT_MAT4,&projection[0][0]);
+	shapes.addRenderableUniformParameter(renderables[1],"ambientLight",Renderer::PT_VEC3,&ambientlight[0]);
+	shapes.addRenderableUniformParameter(renderables[1],"diffuseColor",Renderer::PT_VEC3,&difuseLight[0]);
+	shapes.addRenderableUniformParameter(renderables[1],"normalMat",Renderer::PT_MAT3,&Normal[0][0]);
+	shapes.addRenderableUniformParameter(renderables[1],"Speclight",Renderer::PT_VEC3,&specColor[0]);
+	shapes.addRenderableUniformParameter(renderables[1],"camPos",Renderer::PT_VEC3,&camPos[0]);
+	shapes.addRenderableUniformParameter(renderables[1],"Power",Renderer::PT_FLOAT,&Powerofspectralness);
+    glBindVertexArray(geometries[1]->vertexArrayID);
+	glDrawElements(geometries[1]->indexingMode,geometries[1]->numIndices,GL_UNSIGNED_SHORT,(void*)geometries[1]->geometryoffset);
+
+	finalmat=transformTorus2;
+	shapes.addRenderableUniformParameter(renderables[2],"dominatingColor",Renderer::PT_VEC3,&dominatingColor[0]);
+	shapes.addRenderableUniformParameter(renderables[2],"lightPos",Renderer::PT_VEC3,&lightPosition[0]);
+	shapes.addRenderableUniformParameter(renderables[2],"transform",Renderer::PT_MAT4,&finalmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[2],"world",Renderer::PT_MAT4,&worldmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[2],"projectionMat",Renderer::PT_MAT4,&projection[0][0]);
+	shapes.addRenderableUniformParameter(renderables[2],"ambientLight",Renderer::PT_VEC3,&ambientlight[0]);
+	shapes.addRenderableUniformParameter(renderables[2],"diffuseColor",Renderer::PT_VEC3,&difuseLight[0]);
+	shapes.addRenderableUniformParameter(renderables[2],"normalMat",Renderer::PT_MAT3,&Normal[0][0]);
+	shapes.addRenderableUniformParameter(renderables[2],"Speclight",Renderer::PT_VEC3,&specColor[0]);
+	shapes.addRenderableUniformParameter(renderables[2],"camPos",Renderer::PT_VEC3,&camPos[0]);
+	shapes.addRenderableUniformParameter(renderables[2],"Power",Renderer::PT_FLOAT,&Powerofspectralness);
+	glBindVertexArray(geometries[1]->vertexArrayID);
+	glDrawElements(geometries[1]->indexingMode,geometries[1]->numIndices,GL_UNSIGNED_SHORT,(void*)geometries[1]->geometryoffset);
+
+	finalmat=transformShpere1;
+	shapes.addRenderableUniformParameter(renderables[3],"dominatingColor",Renderer::PT_VEC3,&dominatingColor[0]);
+	shapes.addRenderableUniformParameter(renderables[3],"lightPos",Renderer::PT_VEC3,&lightPosition[0]);
+	shapes.addRenderableUniformParameter(renderables[3],"transform",Renderer::PT_MAT4,&finalmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[3],"world",Renderer::PT_MAT4,&worldmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[3],"projectionMat",Renderer::PT_MAT4,&projection[0][0]);
+	shapes.addRenderableUniformParameter(renderables[3],"ambientLight",Renderer::PT_VEC3,&ambientlight[0]);
+	shapes.addRenderableUniformParameter(renderables[3],"diffuseColor",Renderer::PT_VEC3,&difuseLight[0]);
+	shapes.addRenderableUniformParameter(renderables[3],"normalMat",Renderer::PT_MAT3,&Normal[0][0]);
+	shapes.addRenderableUniformParameter(renderables[3],"Speclight",Renderer::PT_VEC3,&specColor[0]);
+	shapes.addRenderableUniformParameter(renderables[3],"camPos",Renderer::PT_VEC3,&camPos[0]);
+	shapes.addRenderableUniformParameter(renderables[3],"Power",Renderer::PT_FLOAT,&Powerofspectralness);
+	glBindVertexArray(geometries[2]->vertexArrayID);
+	glDrawElements(geometries[2]->indexingMode,geometries[2]->numIndices,GL_UNSIGNED_SHORT,(void*)geometries[2]->geometryoffset);
+
+	finalmat=transformShpere2;
+	shapes.addRenderableUniformParameter(renderables[4],"dominatingColor",Renderer::PT_VEC3,&dominatingColor[0]);
+	shapes.addRenderableUniformParameter(renderables[4],"lightPos",Renderer::PT_VEC3,&lightPosition[0]);
+	shapes.addRenderableUniformParameter(renderables[4],"transform",Renderer::PT_MAT4,&finalmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[4],"world",Renderer::PT_MAT4,&worldmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[4],"projectionMat",Renderer::PT_MAT4,&projection[0][0]);
+	shapes.addRenderableUniformParameter(renderables[4],"ambientLight",Renderer::PT_VEC3,&ambientlight[0]);
+	shapes.addRenderableUniformParameter(renderables[4],"diffuseColor",Renderer::PT_VEC3,&difuseLight[0]);
+	shapes.addRenderableUniformParameter(renderables[4],"normalMat",Renderer::PT_MAT3,&Normal[0][0]);
+	shapes.addRenderableUniformParameter(renderables[4],"Speclight",Renderer::PT_VEC3,&specColor[0]);
+	shapes.addRenderableUniformParameter(renderables[4],"camPos",Renderer::PT_VEC3,&camPos[0]);
+	shapes.addRenderableUniformParameter(renderables[4],"Power",Renderer::PT_FLOAT,&Powerofspectralness);
+	glBindVertexArray(geometries[2]->vertexArrayID);
+	glDrawElements(geometries[2]->indexingMode,geometries[2]->numIndices,GL_UNSIGNED_SHORT,(void*)geometries[2]->geometryoffset);
+
+	finalmat=transformArrow;
+	shapes.addRenderableUniformParameter(renderables[5],"dominatingColor",Renderer::PT_VEC3,&dominatingColor[0]);
+	shapes.addRenderableUniformParameter(renderables[5],"lightPos",Renderer::PT_VEC3,&lightPosition[0]);
+	shapes.addRenderableUniformParameter(renderables[5],"transform",Renderer::PT_MAT4,&finalmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[5],"world",Renderer::PT_MAT4,&worldmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[5],"projectionMat",Renderer::PT_MAT4,&projection[0][0]);
+	shapes.addRenderableUniformParameter(renderables[5],"ambientLight",Renderer::PT_VEC3,&ambientlight[0]);
+	shapes.addRenderableUniformParameter(renderables[5],"diffuseColor",Renderer::PT_VEC3,&difuseLight[0]);
+	shapes.addRenderableUniformParameter(renderables[5],"normalMat",Renderer::PT_MAT3,&Normal[0][0]);
+	shapes.addRenderableUniformParameter(renderables[5],"Speclight",Renderer::PT_VEC3,&specColor[0]);
+	shapes.addRenderableUniformParameter(renderables[5],"camPos",Renderer::PT_VEC3,&camPos[0]);
+	shapes.addRenderableUniformParameter(renderables[5],"Power",Renderer::PT_FLOAT,&Powerofspectralness);
+	glBindVertexArray(geometries[3]->vertexArrayID);
+	glDrawElements(geometries[3]->indexingMode,geometries[3]->numIndices,GL_UNSIGNED_SHORT,(void*)geometries[3]->geometryoffset);
+
+	finalmat=transformArrow;
+	shapes.addRenderableUniformParameter(renderables[6],"dominatingColor",Renderer::PT_VEC3,&dominatingColor[0]);
+	shapes.addRenderableUniformParameter(renderables[5],"lightPos",Renderer::PT_VEC3,&lightPosition[0]);
+	shapes.addRenderableUniformParameter(renderables[6],"transform",Renderer::PT_MAT4,&finalmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[6],"world",Renderer::PT_MAT4,&worldmat[0][0]);
+	shapes.addRenderableUniformParameter(renderables[6],"projectionMat",Renderer::PT_MAT4,&projection[0][0]);
+	shapes.addRenderableUniformParameter(renderables[6],"ambientLight",Renderer::PT_VEC3,&ambientlight[0]);
+	shapes.addRenderableUniformParameter(renderables[6],"diffuseColor",Renderer::PT_VEC3,&difuseLight[0]);
+	shapes.addRenderableUniformParameter(renderables[6],"normalMat",Renderer::PT_MAT3,&Normal[0][0]);
+	shapes.addRenderableUniformParameter(renderables[6],"Speclight",Renderer::PT_VEC3,&specColor[0]);
+	shapes.addRenderableUniformParameter(renderables[6],"camPos",Renderer::PT_VEC3,&camPos[0]);
+	shapes.addRenderableUniformParameter(renderables[6],"Power",Renderer::PT_FLOAT,&Powerofspectralness);
+	glBindVertexArray(geometries[4]->vertexArrayID);
+	glDrawElements(geometries[4]->indexingMode,geometries[4]->numIndices,GL_UNSIGNED_SHORT,(void*)geometries[4]->geometryoffset);
+}

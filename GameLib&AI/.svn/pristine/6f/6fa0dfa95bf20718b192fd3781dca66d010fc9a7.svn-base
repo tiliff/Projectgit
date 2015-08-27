@@ -1,0 +1,26 @@
+#version 400
+
+//PassThrough FragShader
+
+in vec4 outCol;
+in vec2 outUv;
+
+uniform sampler2D myTexture;
+
+void main() {
+	gl_FragColor =texture(myTexture,outUv);
+	//if(gl_FragColor.r < 0.5 && gl_FragColor.g > 0.5 && gl_FragColor.b < 0.5)
+	//{
+	 //discard;
+	//}
+
+	if(gl_FragColor.r > 0.1 && gl_FragColor.g < 0.5 && gl_FragColor.b < 0.5)
+	  {
+	   discard;
+	  }
+
+	//if(gl_FragColor.r < 0.1 && gl_FragColor.g < 0.1 && gl_FragColor.b < 0.1)
+	  //{
+	   //discard;
+	  //}
+}

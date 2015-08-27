@@ -1,0 +1,363 @@
+#include <MyGLWindow.h>
+#include <Qt\qdebug.h>
+#include <glm\glm.hpp>
+#include <gtx\transform.hpp>
+#include <gtc\matrix_transform.hpp>
+#include <fstream>
+#include <ShapeGenerator.h>
+#include <Camera.h>
+
+int cubeIndices;
+int torusindices;
+int planeindices;
+
+GLuint cubeVertexArrayObjectID;
+GLuint torusVertexArrayObjectID;
+GLuint planeVertexArrayObjectID;
+
+Neumont::ShapeData torus;
+Neumont::ShapeData cube;
+Neumont::ShapeData plane;
+Camera cam;
+glm::vec3 ShapeColor;
+glm::vec3 ambientlight;
+glm::vec3 difuseLight;
+glm::vec3 lightPosition(0.0f,1.0f,-8.0f);
+glm::mat3 Normal;
+glm::vec3 specColor;
+float Powerofspectralness;
+
+float angle=0.0f;
+float angley=0.0f;
+MyGLWindow::MyGLWindow(DebugSlider &sARed,DebugSlider &sAGreen,DebugSlider &sABlue,
+			DebugSlider &sDRed,DebugSlider &sDGreen,DebugSlider &sDBlue,
+			DebugSlider &sSRed,DebugSlider &sSGreen,DebugSlider &sSBlue,
+			DebugSlider &Sx,DebugSlider &Sy,DebugSlider &Sz,DebugSlider &SP)
+{
+	ARed=&sARed;
+	AGreen=&sAGreen;
+	ABlue=&sABlue;
+	DRed=&sDRed;
+	DGreen=&sDGreen;
+	DBlue=&sDBlue;
+	SRed=&sSRed;
+	SGreen=&sSGreen;
+	SBlue=&sSBlue;
+	SLx=&Sx;
+	SLy=&Sy;
+	SLz=&Sz;
+	SLpow=&SP;
+}
+MyGLWindow::MyGLWindow()
+{
+
+}
+void MyGLWindow::initializeGL()
+{
+	glewInit();
+	glEnable(GL_DEPTH_TEST);
+	sendDataToHardware();
+	CompileShaders();
+	connect(&mytimer,SIGNAL(timeout()),this,SLOT(myUpdate()));
+	cam.position=glm::vec3(0.0f,5.0f,0.0f);
+	mytimer.start(0);
+}
+void MyGLWindow::paintGL()
+{
+glViewport(0,0,width(),height());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glm::mat4 world=cam.getWorldToViewMatrix();
+	glm::mat4 transform= glm::translate(glm::mat4(),glm::vec3(2.0f,1.0f,-3.0f))*glm::rotate(angley,glm::vec3(1.0f,0.0f,0.0f));
+	transform=transform*glm::rotate(angle,glm::vec3(0.0f,0.0f,-1.0f));
+	glm::mat4 projectionmatrix = glm::perspective(90.0f,((float)width()) / height(),0.1f,100.0f);
+	glm::vec3 dominatingColor=glm::vec3(SRed->value(),SGreen->value(),SBlue->value());
+	ambientlight=glm::vec3(ARed->value(),AGreen->value(),ABlue->value());
+	difuseLight=glm::vec3(DRed->value(),DGreen->value(),DBlue->value());
+	specColor=glm::vec3(SLx->value(),SLy->value(),SLz->value());
+	Powerofspectralness=(SLpow->value());
+	glm::vec3 camPos= glm::vec3(cam.position);
+
+
+	GLint dominatingColorUniformLocation = glGetUniformLocation(programID,"dominatingColor");
+	GLint translateUniformLocation = glGetUniformLocation(programID,"transform");
+	GLint projectionUniformLocation = glGetUniformLocation(programID,"projectionMat");
+	GLint worldUniformLocation = glGetUniformLocation(programID,"world");
+	GLint LightPosUniformLocation = glGetUniformLocation(programID,"lightPos");
+	GLint AmbientUniformLocation = glGetUniformLocation(programID,"ambientLight");
+	GLint DiffuseColorUniformLocation = glGetUniformLocation(programID,"diffuseColor");
+	GLint SpeclightUniformLocation = glGetUniformLocation(programID,"Speclight");
+	GLint camPosUniformLocation = glGetUniformLocation(programID,"camPos");
+	GLint PowerUniformLocation = glGetUniformLocation(programID,"Power");
+	GLint normalMatUniformLocation = glGetUniformLocation(programID,"normalMat");
+
+
+
+	glBindVertexArray(cubeVertexArrayObjectID);
+	glUniform3fv(dominatingColorUniformLocation,1,&dominatingColor[0]);
+	glUniform3fv(LightPosUniformLocation,1,&lightPosition[0]);
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform[0][0]);
+	glUniformMatrix4fv(worldUniformLocation, 1, false, &world[0][0]);
+	glUniformMatrix4fv(projectionUniformLocation, 1, false, &projectionmatrix[0][0]);
+	glUniform3fv(AmbientUniformLocation,1,&ambientlight[0]);
+	glUniform3fv(SpeclightUniformLocation,1,&specColor[0]);
+	glUniform3fv(camPosUniformLocation,1,&camPos[0]);
+	glUniform1fv(PowerUniformLocation,1,&Powerofspectralness);
+	glUniform3fv(DiffuseColorUniformLocation,1,&difuseLight[0]);
+	glUniformMatrix3fv(normalMatUniformLocation, 1, false, &Normal[0][0]);
+	glDrawElements(GL_TRIANGLES,cubeIndices,GL_UNSIGNED_SHORT ,(void*)cubeOffset);
+	
+
+	glm::mat4 transform2=glm::translate(glm::mat4(),glm::vec3(-2.0f,1.0f,-3.0f))*glm::rotate(angley,glm::vec3(1.0f,0.0f,0.0f))*glm::rotate(angle,glm::vec3(0.0f,0.0f,-1.0f));
+	glUniform3fv(dominatingColorUniformLocation,1,&dominatingColor[0]);
+	glUniform3fv(LightPosUniformLocation,1,&lightPosition[0]);
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform2[0][0]);
+	glUniformMatrix4fv(worldUniformLocation, 1, false, &world[0][0]);
+	glUniformMatrix4fv(projectionUniformLocation, 1, false, &projectionmatrix[0][0]);
+	glUniform3fv(AmbientUniformLocation,1,&ambientlight[0]);
+	glUniform3fv(SpeclightUniformLocation,1,&specColor[0]);
+	glUniform3fv(camPosUniformLocation,1,&camPos[0]);
+	glUniform1fv(PowerUniformLocation,1,&Powerofspectralness);
+	glUniform3fv(DiffuseColorUniformLocation,1,&difuseLight[0]);
+	glUniformMatrix3fv(normalMatUniformLocation, 1, false, &Normal[0][0]);
+	glDrawElements(GL_TRIANGLES,cubeIndices,GL_UNSIGNED_SHORT ,(void*)cubeOffset);
+
+	transform2=(glm::mat4)glm::scale(.2,.2,.2)*glm::translate(glm::mat4(),lightPosition);
+	glUniform3fv(dominatingColorUniformLocation,1,&dominatingColor[0]);
+	glUniform3fv(LightPosUniformLocation,1,&lightPosition[0]);
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform2[0][0]);
+	glUniformMatrix4fv(worldUniformLocation, 1, false, &world[0][0]);
+	glUniformMatrix4fv(projectionUniformLocation, 1, false, &projectionmatrix[0][0]);
+	glUniform3fv(AmbientUniformLocation,1,&ambientlight[0]);
+	glUniform3fv(SpeclightUniformLocation,1,&specColor[0]);
+	glUniform3fv(camPosUniformLocation,1,&camPos[0]);
+	glUniform1fv(PowerUniformLocation,1,&Powerofspectralness);
+	glUniform3fv(DiffuseColorUniformLocation,1,&difuseLight[0]);
+	glUniformMatrix3fv(normalMatUniformLocation, 1, false, &Normal[0][0]);
+	glDrawElements(GL_TRIANGLES,cubeIndices,GL_UNSIGNED_SHORT ,(void*)cubeOffset);
+
+	glBindVertexArray(torusVertexArrayObjectID);
+	glm::mat4 transform3=glm::translate(glm::mat4(),glm::vec3(0.0f,-2.0f,-3.0f))*glm::rotate(angley,glm::vec3(1.0f,0.0f,0.0f))*glm::rotate(angle,glm::vec3(0.0f,0.0f,-1.0f));
+	glUniform3fv(dominatingColorUniformLocation,1,&dominatingColor[0]);
+	glUniform3fv(LightPosUniformLocation,1,&lightPosition[0]);
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform3[0][0]);
+	glUniformMatrix4fv(worldUniformLocation, 1, false, &world[0][0]);
+	glUniformMatrix4fv(projectionUniformLocation, 1, false, &projectionmatrix[0][0]);
+	glUniform3fv(AmbientUniformLocation,1,&ambientlight[0]);
+	glUniform3fv(SpeclightUniformLocation,1,&specColor[0]);
+	glUniform3fv(camPosUniformLocation,1,&camPos[0]);
+	glUniform1fv(PowerUniformLocation,1,&Powerofspectralness);
+	glUniform3fv(DiffuseColorUniformLocation,1,&difuseLight[0]);
+	glUniformMatrix3fv(normalMatUniformLocation, 1, false, &Normal[0][0]);
+	glDrawElements(GL_TRIANGLES,torusindices,GL_UNSIGNED_SHORT ,(void*)torusOffset);
+
+	glBindVertexArray(planeVertexArrayObjectID);
+	transform3=glm::translate(glm::mat4(),glm::vec3(0.0f,-3.0f,0.0f));
+	glUniform3fv(dominatingColorUniformLocation,1,&dominatingColor[0]);
+	glUniform3fv(LightPosUniformLocation,1,&lightPosition[0]);
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform3[0][0]);
+	glUniformMatrix4fv(worldUniformLocation, 1, false, &world[0][0]);
+	glUniformMatrix4fv(projectionUniformLocation, 1, false, &projectionmatrix[0][0]);
+	glUniform3fv(AmbientUniformLocation,1,&ambientlight[0]);
+	glUniform3fv(SpeclightUniformLocation,1,&specColor[0]);
+	glUniform3fv(camPosUniformLocation,1,&camPos[0]);
+	glUniform1fv(PowerUniformLocation,1,&Powerofspectralness);
+	glUniform3fv(DiffuseColorUniformLocation,1,&difuseLight[0]);
+	glUniformMatrix3fv(normalMatUniformLocation, 1, false, &Normal[0][0]);
+	glDrawElements(GL_TRIANGLES,planeindices,GL_UNSIGNED_SHORT ,(void*)planeOffset);
+}
+void MyGLWindow::sendDataToHardware()
+{
+
+	cube= Neumont::ShapeGenerator::makeCube();
+	torus= Neumont::ShapeGenerator::makeTorus(10);
+	plane=Neumont::ShapeGenerator::makePlane(25);
+
+
+	glGenBuffers(1,&bufferID);
+	glBindBuffer(GL_ARRAY_BUFFER,bufferID);
+	glBufferData(GL_ARRAY_BUFFER,cube.vertexBufferSize()+cube.indexBufferSize()+torus.vertexBufferSize()+torus.indexBufferSize()+plane.vertexBufferSize()+plane.indexBufferSize(), 0, GL_STATIC_DRAW);
+	GLsizei currentOffset = 0;
+	glBufferSubData(GL_ARRAY_BUFFER,currentOffset,cube.vertexBufferSize(),cube.verts);
+	currentOffset+= cube.vertexBufferSize();
+	glBufferSubData(GL_ARRAY_BUFFER,currentOffset,cube.indexBufferSize(),cube.indices);
+	currentOffset+=cube.indexBufferSize();
+	glBufferSubData(GL_ARRAY_BUFFER,currentOffset,torus.vertexBufferSize(),torus.verts);
+	currentOffset+= torus.vertexBufferSize();
+	glBufferSubData(GL_ARRAY_BUFFER,currentOffset,torus.indexBufferSize(),torus.indices);
+	currentOffset+= torus.indexBufferSize();
+	glBufferSubData(GL_ARRAY_BUFFER,currentOffset,plane.vertexBufferSize(),plane.verts);
+	currentOffset+= plane.vertexBufferSize();
+	glBufferSubData(GL_ARRAY_BUFFER,currentOffset,plane.indexBufferSize(),plane.indices);
+	currentOffset+= plane.indexBufferSize();
+
+
+
+	
+
+	
+	cubeIndices=cube.numIndices;
+	torusindices=torus.numIndices;
+	planeindices=plane.numIndices;
+
+	glGenVertexArrays(1,&cubeVertexArrayObjectID);
+	glGenVertexArrays(1,&torusVertexArrayObjectID);
+	glGenVertexArrays(1,&planeVertexArrayObjectID);
+
+
+	glBindVertexArray(cubeVertexArrayObjectID);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER,bufferID);
+	glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,12*sizeof(float),0);
+	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,12*sizeof(float),(void*)(3*sizeof(float)));
+	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,12*sizeof(float),(void*)(7*sizeof(float)));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,bufferID);
+
+	glBindVertexArray(torusVertexArrayObjectID);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER,bufferID);
+	GLuint torusByteOffset = cube.vertexBufferSize()+cube.indexBufferSize();
+	glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,12*sizeof(float),(void*)(torusByteOffset));
+	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,12*sizeof(float),(void*)(torusByteOffset+(3*sizeof(float))));
+	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,12*sizeof(float),(void*)(torusByteOffset+7*sizeof(float)));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,bufferID);
+
+	glBindVertexArray(planeVertexArrayObjectID);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER,bufferID);
+	GLuint planeByteOffset = cube.vertexBufferSize()+cube.indexBufferSize() + torus.vertexBufferSize()+torus.indexBufferSize();
+	glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,12*sizeof(float),(void*)(planeByteOffset));
+	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,12*sizeof(float),(void*)(planeByteOffset+(3*sizeof(float))));
+	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,12*sizeof(float),(void*)(planeByteOffset+(7*sizeof(float))));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,bufferID);
+
+	planeOffset= plane.vertexBufferSize()+planeByteOffset;
+	torusOffset=torus.vertexBufferSize()+torusByteOffset;
+	cubeOffset=cube.vertexBufferSize();
+}
+std::string readShaderCode(const char *fileName)
+{
+	std::ifstream input(fileName);
+
+	if(!input.good())
+	{
+		qDebug() << "File not found" << fileName;
+		exit(1);
+	}
+	return std::string(std::istreambuf_iterator<char>(input),
+		std::istreambuf_iterator<char>());
+}
+void MyGLWindow::CompileShaders()
+{
+	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragShaderID=glCreateShader(GL_FRAGMENT_SHADER);
+	const char* adapter[1];
+	
+	std::string shaderCode= readShaderCode("../shaders/LightingVertexShaderCode.glsl");
+	adapter[0] = shaderCode.c_str();
+	glShaderSource(vertexShaderID,1,adapter,0);
+
+	shaderCode= readShaderCode("../shaders/LightingFragmentShaderCode.glsl");
+	adapter[0] = shaderCode.c_str();
+	glShaderSource(fragShaderID,1,adapter,0);
+
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragShaderID);
+
+	GLint compileStatus;
+	glGetShaderiv(vertexShaderID,GL_COMPILE_STATUS,&compileStatus);
+	if(compileStatus != GL_TRUE)
+	{
+		GLint logLength;
+		glGetShaderiv(vertexShaderID,GL_INFO_LOG_LENGTH, &logLength);
+		char* buffer = new char [logLength];
+		GLsizei bitBucket;
+		glGetShaderInfoLog(vertexShaderID,logLength,&bitBucket,buffer);
+		qDebug() <<buffer;
+		delete [] buffer;
+	}
+
+	programID = glCreateProgram();
+	glAttachShader(programID,vertexShaderID);
+	glAttachShader(programID,fragShaderID);
+
+	glLinkProgram(programID);
+
+	glUseProgram(programID);
+
+	glDeleteShader(vertexShaderID);
+	glDeleteShader(fragShaderID);
+}
+void MyGLWindow::myUpdate()
+{
+	angle += 2.0f;
+
+	angley -= 2.0f;
+	if(GetAsyncKeyState('E'))
+	{
+	QCursor mouse = cursor();
+	QPoint mousePosition = mouse.pos();
+	cam.mouseUpdate(glm::vec2(mousePosition.x(),mousePosition.y()));
+	}
+
+	if(GetAsyncKeyState('W'))
+	{
+		cam.moveForward();
+	}
+	if(GetAsyncKeyState('S'))
+	{
+		cam.moveBackward();
+	}
+	if(GetAsyncKeyState('A'))
+	{
+		cam.strafeLeft();
+	}
+	if(GetAsyncKeyState('D'))
+	{
+		cam.strafeRight();
+	}
+	if(GetAsyncKeyState('R'))
+	{
+		cam.moveUp();
+	}
+	if(GetAsyncKeyState('F'))
+	{
+		cam.moveDown();
+	}
+	if(GetAsyncKeyState('Y'))
+	{
+		lightPosition[1]+=0.1f;
+	}
+	if(GetAsyncKeyState('H'))
+	{
+		lightPosition[1]-=0.1f;
+	}
+	if(GetAsyncKeyState('L'))
+	{
+		lightPosition[0]+=0.1f;
+	}
+	if(GetAsyncKeyState('J'))
+	{
+		lightPosition[0]-=0.1f;
+	}
+	if(GetAsyncKeyState('K'))
+	{
+		lightPosition[2]+=0.1f;
+	}
+	if(GetAsyncKeyState('I'))
+	{
+		lightPosition[2]-=0.1f;
+	}
+	
+		
+	
+	paintGL();
+	swapBuffers();
+}

@@ -1,0 +1,29 @@
+#pragma once
+#include <QtOpenGL\qglwidget>
+#include <Qt\qtimer.h>
+#include "DebugSlider.h"
+class GlWindow : public QGLWidget
+{
+	Q_OBJECT 
+	QTimer mytimer;
+	void sendDataToHardware();
+	void compileShaders();
+	GlWindow();
+	GlWindow(DebugSlider &sARed,DebugSlider &sAGreen,DebugSlider &sABlue,
+			DebugSlider &sDRed,DebugSlider &sDGreen,DebugSlider &sDBlue,
+			DebugSlider &sSRed,DebugSlider &sSGreen,DebugSlider &sSBlue);
+protected:
+	void initializeGL();
+	void paintGL();
+private slots:
+	void myUpdate();
+	DebugSlider*ARed;
+	DebugSlider*AGreen;
+	DebugSlider*ABlue;
+	DebugSlider*DRed;
+	DebugSlider*DGreen;
+	DebugSlider*DBlue;
+	DebugSlider*SRed;
+	DebugSlider*SGreen;
+	DebugSlider*SBlue;
+};

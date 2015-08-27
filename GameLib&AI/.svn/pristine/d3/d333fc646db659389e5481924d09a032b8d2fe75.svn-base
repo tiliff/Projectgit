@@ -1,0 +1,184 @@
+#include "Renderer.h"
+GLuint offset=0;
+Renderer::GeometryInfo* Renderer::addGeometry(const void* verts, GLuint vertexDataSize, 
+ushort* indices, uint numIndices,GLuint indexingMode)
+{
+    BufferInfo* meBuffer = nullptr;
+	GLuint totalDataSize=vertexDataSize + numIndices*sizeof(ushort);
+	bool foundBuffer=false;
+	GeometryInfo* ret = nullptr;
+	for(int i=0; i <10 && !foundBuffer; i++)
+	{
+		if(meBufferInfos[i].remainingSize >= totalDataSize)
+		{
+			meBuffer= &meBufferInfos[i];
+			foundBuffer=true;
+		}
+		    
+	}
+			assert(foundBuffer);
+			meBuffer->remainingSize -= totalDataSize;
+			GeometryInfos[currentGeometry].buffer=meBuffer;
+			GeometryInfos[currentGeometry].BufferOffset=meBuffer->Boffset;
+			glBindBuffer(GL_ARRAY_BUFFER, meBuffer->glBufferID);
+			glBufferSubData(GL_ARRAY_BUFFER,meBuffer->Boffset,vertexDataSize,verts);
+			meBuffer->Boffset+=vertexDataSize;
+			glBufferSubData(GL_ARRAY_BUFFER,meBuffer->Boffset,numIndices*sizeof(ushort),indices);
+			GeometryInfos[currentGeometry].geometryoffset=meBuffer->Boffset;
+			meBuffer->Boffset+=numIndices*sizeof(ushort);
+
+			glGenVertexArrays(1,&GeometryInfos[currentGeometry].vertexArrayID);
+			GeometryInfos[currentGeometry].numIndices=numIndices;
+			GeometryInfos[currentGeometry].indexingMode=indexingMode;
+
+			return &GeometryInfos[currentGeometry++];
+}
+
+std::string readShaderCode(const char *fileName)
+{
+	std::ifstream input(fileName);
+
+	if(!input.good())
+	{
+		qDebug() << "File not found" << fileName;
+		exit(1);
+	}
+	return std::string(std::istreambuf_iterator<char>(input),
+		std::istreambuf_iterator<char>());
+}
+
+Renderer::ShaderInfo* Renderer::createShaderInfo(const char* vertexShaderFileName,
+const char* fragmentShaderFileName)
+{
+	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragShaderID=glCreateShader(GL_FRAGMENT_SHADER);
+	const char* adapter[1];
+	
+	std::string shaderCode= readShaderCode(vertexShaderFileName);
+	adapter[0] = shaderCode.c_str();
+	glShaderSource(vertexShaderID,1,adapter,0);
+
+	shaderCode= readShaderCode(fragmentShaderFileName);
+	adapter[0] = shaderCode.c_str();
+	glShaderSource(fragShaderID,1,adapter,0);
+
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragShaderID);
+
+	GLint compileStatus;
+	glGetShaderiv(vertexShaderID,GL_COMPILE_STATUS,&compileStatus);
+	if(compileStatus != GL_TRUE)
+	{
+		GLint logLength;
+		glGetShaderiv(vertexShaderID,GL_INFO_LOG_LENGTH, &logLength);
+		char* buffer = new char [logLength];
+		GLsizei bitBucket;
+		glGetShaderInfoLog(vertexShaderID,logLength,&bitBucket,buffer);
+		qDebug() <<buffer;
+		delete [] buffer;
+	}
+
+	shaderInfos[currentShader].programID = glCreateProgram();
+	glAttachShader(shaderInfos[currentShader].programID,vertexShaderID);
+	glAttachShader(shaderInfos[currentShader].programID,fragShaderID);
+
+	glLinkProgram(shaderInfos[currentShader].programID);
+
+	glUseProgram(shaderInfos[currentShader].programID);
+
+	glDeleteShader(vertexShaderID);
+	glDeleteShader(fragShaderID);
+
+	return &shaderInfos[currentShader++];
+}
+
+void Renderer::addShaderStreamedParameter(GeometryInfo* geometry,uint layoutLocation, 
+Renderer::ParameterType parameterType,uint bufferOffset,uint bufferStride)
+{
+	        int temp= parameterType/sizeof(float);
+			glBindVertexArray(geometry->vertexArrayID);
+			glEnableVertexAttribArray(layoutLocation);
+			glBindBuffer(GL_ARRAY_BUFFER,geometry->buffer->glBufferID);
+			glVertexAttribPointer(layoutLocation,temp,GL_FLOAT, GL_FALSE,bufferStride,(void*)bufferOffset);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,geometry->buffer->glBufferID);
+}
+
+Renderer::RenderableInfo* Renderer::addRenderable(GeometryInfo* whatGeometry,
+const glm::mat4& whereMatrix,ShaderInfo* howShaders,TextureInfo* Texture)
+{
+
+
+	RenderableInfos[currentRenderable].whatGeometry = whatGeometry;
+	RenderableInfos[currentRenderable].whereMatrix = whereMatrix;
+	RenderableInfos[currentRenderable].howShaders = howShaders;
+	RenderableInfos[currentRenderable].texture = Texture;
+	return &RenderableInfos[currentRenderable++];
+}
+
+void Renderer::addRenderableUniformParameter(RenderableInfo* renderable,const char* name,
+Renderer::ParameterType parameterType,const float* value)
+{
+	glUseProgram(renderable->howShaders->programID);
+	GLuint uniformLocation = glGetUniformLocation(renderable->howShaders->programID, name);
+
+	if(parameterType == PT_FLOAT)
+	{
+		glUniform1fv(uniformLocation,1,value);
+	}
+	if(parameterType == PT_VEC2)
+	{
+		glUniform2fv(uniformLocation,1,value);
+	}
+	if(parameterType == PT_VEC3)
+	{
+		glUniform3fv(uniformLocation,1,value);
+	}
+	if(parameterType == PT_VEC4)
+	{
+		glUniform4fv(uniformLocation,1,value);
+	}
+	if(parameterType == PT_MAT3)
+	{
+		glUniformMatrix3fv(uniformLocation,1,GL_FALSE,value);
+	}
+	if(parameterType == PT_MAT4)
+	{
+		glUniformMatrix4fv(uniformLocation,1,GL_FALSE,value);
+	}
+	
+	
+}
+
+void Renderer::TextureInfo::setActiveTexture(const char* textureName)
+{
+
+}
+
+Renderer::TextureInfo* Renderer::addTexture(const char* fileName)
+{
+	QImage texture;
+	GLuint theImage;
+	if(!texture.load(fileName))
+	{
+		qDebug()<<"Texture Load Failure.";
+	}
+    else
+    {
+     QImage finalImage = QGLWidget::convertToGLFormat(texture);
+     glGenTextures(1.0f, &theImage);
+     glBindTexture(GL_TEXTURE_2D, theImage);
+     glTexImage2D(GL_TEXTURE_2D, 0.0f, GL_RGBA8, finalImage.width(), finalImage.height(), 0.0f, GL_BGRA, GL_UNSIGNED_BYTE, finalImage.bits());
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+   
+     glGenerateMipmap(GL_TEXTURE_2D);
+     glEnable(GL_TEXTURE_2D);
+     textureInfos[currentTexture].TextureID = theImage;
+    }
+   
+    TextureInfo &retTexture = textureInfos[currentTexture];
+    currentTexture++;
+    return &retTexture;
+   }

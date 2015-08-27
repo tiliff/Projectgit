@@ -1,0 +1,20 @@
+#pragma once
+#include "..\PhysicsGui\include\PhysicsGui\GuiBase.h"
+#include "..\PhysicsGui\include\PhysicsGui\VectorGraphic.h"
+
+
+
+class VelocityAcceleration : public GuiBase
+{
+	VectorGraphic* graphic;
+	VectorGraphic* velocityGraphic;
+	glm::vec3 position;
+	glm::vec3 velocity;
+public:
+	void initialize();
+	void newFrame();
+	void vectorGraphicMouseDrag(glm::uint vectorGraphicIndex,const glm::vec3& dragDelta);
+	glm::vec3 getUserDirection();
+
+};
+

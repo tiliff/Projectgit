@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AE83CBBA-2EA9-488B-915D-5EE97792AC26}</ProjectGuid>
+    <RootNamespace>VelocityAcceleration</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\MiddleWare\glm;$(SolutionDir)..\MiddleWare\glew\include;$(SolutionDir)..\MiddleWare\NeumontTools\include;$(SolutionDir)..\MiddleWare\Qt\include;$(SolutionDir)..\MiddleWare\PhysicsGui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\MiddleWare\glew\lib;$(SolutionDir)..\MiddleWare\Qt\lib;$(SolutionDir)..\MiddleWare\NeumontTools\lib;$(SolutionDir)..\MiddleWare\PhysicsGui\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>NeumontTools.lib;opengl32.lib;glew32d.lib;QtOpenGLd4.lib;QtGuid4.lib;QtCored4.lib;PhysicsGui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="DebugSlider.cpp" />
+    <ClCompile Include="DragForces.cpp" />
+    <ClCompile Include="DragWidg.cpp" />
+    <ClCompile Include="Forces.cpp" />
+    <ClCompile Include="KeyForce.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="moc_DebugSlider.cpp" />
+    <ClCompile Include="Momentum.cpp" />
+    <ClCompile Include="MyWidge.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleDrag.cpp" />
+    <ClCompile Include="ParticleForceRegistry.cpp" />
+    <ClCompile Include="ParticleGravity.cpp" />
+    <ClCompile Include="ParticleSpring.cpp" />
+    <ClCompile Include="SpringForces.cpp" />
+    <ClCompile Include="SpringWidg.cpp" />
+    <ClCompile Include="VelocityAcceleration.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DebugSlider.h" />
+    <ClInclude Include="DragForces.h" />
+    <ClInclude Include="DragWidg.h" />
+    <ClInclude Include="Forces.h" />
+    <ClInclude Include="KeyForce.h" />
+    <ClInclude Include="Momentum.h" />
+    <ClInclude Include="MyWidge.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleDrag.h" />
+    <ClInclude Include="ParticleForceRegistry.h" />
+    <ClInclude Include="ParticleGravity.h" />
+    <ClInclude Include="ParticleSpring.h" />
+    <ClInclude Include="PfGen.h" />
+    <ClInclude Include="SpringForces.h" />
+    <ClInclude Include="SpringWidg.h" />
+    <ClInclude Include="VelocityAcceleration.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

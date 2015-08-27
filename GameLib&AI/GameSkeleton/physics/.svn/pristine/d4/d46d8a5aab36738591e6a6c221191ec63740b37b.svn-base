@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Mainer.cpp" />
+    <ClCompile Include="Lab1\MeParticleDemo.cpp" />
+    <ClCompile Include="PhysicsStuff\Particle.cpp" />
+    <ClCompile Include="PhysicsStuff\DebugSlider.cpp" />
+    <ClCompile Include="PhysicsStuff\moc_DebugSlider.cpp" />
+    <ClCompile Include="Lab2\Momentum.cpp" />
+    <ClCompile Include="Lab2\MyWidge.cpp" />
+    <ClCompile Include="Lab3\Forces.cpp" />
+    <ClCompile Include="Lab3\KeyForce.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleForceRegistry.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleGravity.cpp" />
+    <ClCompile Include="Lab3\FaccumWidge.cpp" />
+    <ClCompile Include="Lab4\DragForces.cpp" />
+    <ClCompile Include="Lab4\DragWidg.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleDrag.cpp" />
+    <ClCompile Include="Lab5\SpringForces.cpp" />
+    <ClCompile Include="Lab5\SpringWidg.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleSpring.cpp" />
+    <ClCompile Include="Lab6\MultiSpringForces.cpp" />
+    <ClCompile Include="Lab6\MultiSpringWidg.cpp" />
+    <ClCompile Include="Lab7\CollisionSolo.cpp" />
+    <ClCompile Include="Lab7\soloCollisionWidg.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleContact.cpp" />
+    <ClCompile Include="Lab9\RestingContact.cpp" />
+    <ClCompile Include="Lab9\restingContactWidg.cpp" />
+    <ClCompile Include="Lab10\RestingContacts.cpp" />
+    <ClCompile Include="Lab10\restingContactsWidg.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleContacts.cpp" />
+    <ClCompile Include="Lab12\AngularVelocityLab.cpp" />
+    <ClCompile Include="Lab12\AngularVelocityWidge.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Lab1\MeParticleDemo.h" />
+    <ClInclude Include="PhysicsStuff\Particle.h" />
+    <ClInclude Include="PhysicsStuff\DebugSlider.h" />
+    <ClInclude Include="Lab2\Momentum.h" />
+    <ClInclude Include="Lab2\MyWidge.h" />
+    <ClInclude Include="Lab3\Forces.h" />
+    <ClInclude Include="Lab3\KeyForce.h" />
+    <ClInclude Include="PhysicsStuff\ParticleForceRegistry.h" />
+    <ClInclude Include="PhysicsStuff\ParticleGravity.h" />
+    <ClInclude Include="PhysicsStuff\PfGen.h" />
+    <ClInclude Include="Lab3\FaccumWidge.h" />
+    <ClInclude Include="Lab4\DragForces.h" />
+    <ClInclude Include="Lab4\DragWidg.h" />
+    <ClInclude Include="PhysicsStuff\ParticleDrag.h" />
+    <ClInclude Include="Lab5\SpringForces.h" />
+    <ClInclude Include="Lab5\SpringWidg.h" />
+    <ClInclude Include="PhysicsStuff\ParticleSpring.h" />
+    <ClInclude Include="Lab6\MultiSpringForces.h" />
+    <ClInclude Include="Lab6\MultiSpringWidg.h" />
+    <ClInclude Include="Lab7\CollisionSolo.h" />
+    <ClInclude Include="Lab7\soloCollisionWidg.h" />
+    <ClInclude Include="PhysicsStuff\ParticleContact.h" />
+    <ClInclude Include="Lab9\RestingContact.h" />
+    <ClInclude Include="Lab9\restingContactWidg.h" />
+    <ClInclude Include="Lab10\RestingContacts.h" />
+    <ClInclude Include="Lab10\restingContactsWidg.h" />
+    <ClInclude Include="PhysicsStuff\ParticleContacts.h" />
+    <ClInclude Include="Lab12\AngularVelocityLab.h" />
+    <ClInclude Include="Lab12\AngularVelocityWidge.h" />
+  </ItemGroup>
+</Project>

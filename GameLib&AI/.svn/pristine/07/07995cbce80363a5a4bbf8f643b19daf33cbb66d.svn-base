@@ -1,0 +1,65 @@
+#pragma once
+#include <QtGui\QVBoxLayout>
+#include <QtGui\qlabel.h>
+#include <QtGui\qslider.h>
+#include <..\..\NeumontTools\include\Slider.h>
+#include <QtGui\qcheckbox.h>
+#include <sstream>
+
+class MyDebugMenu
+{
+	QVBoxLayout* meLayout;
+	static MyDebugMenu theInstance;
+	MyDebugMenu(){}
+	MyDebugMenu(const MyDebugMenu&);
+	MyDebugMenu& operator=(MyDebugMenu&);
+	int numWatches;
+	struct FloatWatcher
+	{
+    const float* theFloat;
+	QLabel* theLabel;
+	QLabel* floatText;
+	public :
+		void initialize(const char* label,const float& theFloat)
+		{
+			std::stringstream s;
+			this->theLabel->setText=label;
+			s << theFloat;
+			const char* str=s.str().c_str();
+			this->floatText->setText=str;
+		}
+		
+	};
+	QList<FloatWatcher> watching;
+	struct SliderWatcher
+	{
+    const float* theFloat;
+	QSlider* theSlider;
+	const float* min;
+	const int* max;
+	void initialize(const float& theFloat,float min,float max)
+		{
+			theSlider=new QSlider(Qt::Orientation::Horizontal);
+			theSlider->setMinimum(min);
+			theSlider->setMaximum(max);
+			theSlider->setValue(theFloat);
+		}
+	};
+	QList<SliderWatcher> watchedSl;
+	struct BoolWatcher
+	{
+    const bool* thebool;
+	QCheckBox* theCheckBox;
+	void initialize(const bool* thebool)
+		{
+			
+		}
+	};
+	QList<BoolWatcher> watchedBool;
+public:
+	static MyDebugMenu& getInstance(){return theInstance;}
+	void initialize(QVBoxLayout* layout);
+	void watch(const char* label,const float& theFloat);
+	void Update();
+};
+#define debugMenu MyDebugMenu::getInstance();

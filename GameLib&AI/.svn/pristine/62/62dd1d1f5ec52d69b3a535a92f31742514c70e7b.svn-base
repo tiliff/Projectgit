@@ -1,0 +1,24 @@
+#pragma once
+#include <GL\glew.h>
+#include <QtOpenGL\qglwidget>
+#include <Qt\qtimer.h>
+
+class MyGLWindow : public QGLWidget
+{
+	Q_OBJECT 
+	QTimer mytimer;
+	GLuint programID;
+	GLuint bufferID;
+	GLuint indexBufferID;
+    uint torusOffset;
+	uint cubeOffset;
+
+protected:
+	void initializeGL();
+	void paintGL();
+	void sendDataToHardware();
+	void CompileShaders();
+private slots:
+	void myUpdate();
+};
+

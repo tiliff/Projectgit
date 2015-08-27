@@ -1,0 +1,348 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CSC160_GenericLinkedList
+{
+
+    public class GenericLinkedList<T> where T : IComparable<T>  
+        {
+            Node<T> Head { get; set; }
+            Node<T> Tail { get; set; }
+            Node<T> SortNode { get; set; }
+            int size { get; set; }
+
+            //The region bleow holds a nested class! 
+            #region Nested Node Class
+
+            //Change the Node class below so that it's only visible to the
+            //GenericLinkedList class and its derived classes.
+            //Make it generic using the placeholder "T".
+            class Node<N>
+            {
+                public Node<N> next { get; set; }
+                public N item { get; set; }
+
+                public Node(N item)
+                {
+                    this.item = item;
+                    this.next = null;
+                }
+                public Node(N item, Node<N> next)
+                {
+                    this.item = item;
+                    this.next = next;
+                }
+                
+            }
+            #endregion
+
+
+            //Create Head and Tail properties, both of type Node<T>
+            //These properties should only be visible to this class
+            //and any of its derived classes
+
+            //Create a property called Count
+            //This property will represent the number of elements
+            //in the LinkedList at any given time.
+            //It should always start at 0, increment when an item
+            //is added, decrement when an item is removed, and NEVER
+            //be a negative number.
+            //The get must be public, but the set should only be
+            //visible to this class and its derived classes.
+
+            /// <summary>
+            /// Places the new value at the Tail end of the linked list
+            /// </summary>
+            /// <param name="data">The new value to be added</param>
+            public void Add(T data)
+            {
+                if (size == 0)
+                {
+                    Tail = new Node<T>(data);
+                    Head = Tail;
+                }
+                else
+                {
+                    Tail.next = new Node<T>(data);
+                    Tail = Tail.next;
+                }
+                size++;
+            }
+
+            public int Size()
+            {
+                return size;
+            }
+
+            public void AddToFront(T data)
+            {
+
+                if (size == 0)
+                    Head = Tail = new Node<T>(data);
+                else
+                    Head = new Node<T>(data, Head);
+                size++;
+            }
+
+            private Node<T> GetNode(int index)
+            {
+                {
+                    if (index > size || index < 0)
+                    {
+                        Console.WriteLine("You have entered an invalid index number");
+                    }
+                    if (index == 0)
+                    {
+                        return Head;
+                    }
+                    else if (index == (size))
+                    {
+                        return Tail;
+                    }
+                    else
+                    {
+                        Node<T> currentNode = Head;
+                        for (int i = 0; i < index; i++)
+                        {
+                            currentNode = currentNode.next;
+                        }
+                        return currentNode;
+
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Places a new value at the index specified
+            /// </summary>
+            /// <param name="data">The new value to be added</param>
+            /// <param name="index">The index where the new value will be stored</param>
+            public void Insert(T data, int index)
+            {
+                if (index > size || index < 0)
+                {
+                    Console.WriteLine("You have entered an invalid index number");
+                }
+                if (index == 0)
+                {
+                    AddToFront(data);
+                }
+                else if (index == (size - 1))
+                {
+                    Add(data);
+                }
+                else
+                {
+                    Node<T> currentNode = Head;
+                    for (int i = 0; i < index - 1; i++)
+                    {
+                        currentNode = currentNode.next;
+                    }
+                    Node<T> newNode = new Node<T>(data, currentNode.next);
+                    currentNode.next = newNode;
+                    size++;
+                }
+            }
+
+            /// <summary>
+            /// Gets the value stored at the specified index
+            /// </summary>
+            /// <param name="index">The specified index</param>
+            /// <returns>The value stored at the specified index</returns>
+            public T Get(int index)
+            {
+                if (index > size || index < 0)
+                {
+                    Console.WriteLine("You have entered an invalid index number");
+                }
+                if (index == 0)
+                {
+                    return Head.item;
+                }
+                else if (index == (size))
+                {
+                    return Tail.item;
+                }
+                else
+                {
+                    Node<T> currentNode = Head;
+                    for (int i = 0; i < index; i++)
+                    {
+                        currentNode = currentNode.next;
+                    }
+                    return currentNode.item;
+
+                }
+            }
+
+            /// <summary>
+            /// Removes the value stored at the Head of the linked list
+            /// </summary>
+            /// <returns>The value removed</returns>
+            public T Remove()
+            {
+                if (size == 0)
+                    Console.WriteLine("The list is empty");
+                T removedData = Head.item;
+                if (Head == Tail)
+                    Head = Tail = null;
+                else
+                    Head = Head.next;
+                size--;
+                return removedData;
+            }
+
+            /// <summary>
+            /// Removes the value at the specified index
+            /// </summary>
+            /// <param name="index">The specified index</param>
+            /// <returns>The value removed</returns>
+            public T RemoveAt(int index)
+            {
+                if (index > size || index < 0)
+                    Console.WriteLine("The Index Entered is not valid");
+                T removedData;
+                if (index == 0)
+                    removedData = Remove();
+                else if (index == (size - 1))
+                    removedData = RemoveLast();
+                else
+                {
+                    Node<T> currentNode = Head;
+                    for (int i = 0; i < index; i++)
+                    {
+                        currentNode = currentNode.next;
+                    }
+                    removedData = currentNode.item;
+                    currentNode.next = currentNode.next.next;
+                    size--;
+                }
+                return removedData;
+            }
+
+            /// <summary>
+            /// Removes the value stored at the Tail of the linked list
+            /// </summary>
+            /// <returns>The value removed</returns>
+            public T RemoveLast()
+            {
+                if (size == 0)
+                    Console.WriteLine("List Is empty");
+                T removedData = Tail.item;
+                if (Head == Tail)
+                    Head = Tail = null;
+                else
+                {
+                    Node<T> currentNode = Head;
+                    while (currentNode.next != Tail)
+                        currentNode = currentNode.next;
+                    Tail = currentNode;
+                    currentNode.next = null;
+                }
+                size--;
+                return removedData;
+            }
+
+            /// <summary>
+            /// Creates a string representing the linked list by its values.
+            /// If the collection is empty, this will return the empty string.
+            /// All values will be separated by a single space character with no
+            /// leading or trailing spaces.
+            /// </summary>
+            /// <returns>The string representation of the collection</returns>
+            public override string ToString()
+            {
+                if (size == 0)
+                {
+                    return string.Empty;
+                }
+                StringBuilder returnString = new StringBuilder();
+                Node<T> currentNode = Head;
+
+                for (int i = 0; i < size; i++)
+                {
+                    if (returnString.Length > 0)
+                    {
+                        returnString.Append("->");
+                    }
+                    returnString.Append(currentNode.item);
+                    currentNode = currentNode.next;
+                }
+                return returnString.ToString();
+            }
+
+            /// <summary>
+            /// Removes all elements from the linked list
+            /// </summary>
+            public void Clear()
+            {
+                Head = Tail = null;
+                size = 0;
+            }
+
+            /// <summary>
+            /// Searches for the specified value and returns the first index that contains it
+            /// </summary>
+            /// <param name="value">The specified value</param>
+            /// <returns>The first index containing the value or -1 if the value is not found</returns>
+            public int Search(T value)
+            {
+                Node<T> currentNode = Head;
+                int ret = -1;
+                for (int i = 0; i < size; i++)
+                {
+                    currentNode = currentNode.next;
+                    if (currentNode.ToString() == value.ToString())
+                    {
+                        return i;
+                    }
+                }
+                return ret;
+            }
+
+            /// <summary>
+            /// Organizes the values in the linked list starting from the Head
+            /// </summary>
+            /// <param name="sortDescending">Indicates whether the sort is ascending or descending. The default is ascending.</param>
+            public void Sort(bool sortDescending = false)
+            {
+                T tempData;
+                if (!sortDescending)
+                {
+
+                    for (int i = 0; i < size; i++)
+                    {
+                        for (int j = 0; j < size - 1; j++)
+                        {
+                            if (Get(j).CompareTo(Get(j + 1)) > 0)
+                            {
+                                tempData = Get(j);
+                                GetNode(j).item = GetNode(j + 1).item;
+                                GetNode(j + 1).item = tempData;
+
+                            }
+                        }
+                    }
+                }
+                else if (sortDescending)
+                {
+                    for (int i = 0; i < size; i++)
+                    {
+                        for (int j = 0; j < size - 1; j++)
+                        {
+                            if (Get(j).CompareTo(Get(j + 1)) < 0)
+                            {
+                                tempData = Get(j);
+                                GetNode(j).item = GetNode(j + 1).item;
+                                GetNode(j + 1).item = tempData;
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+}

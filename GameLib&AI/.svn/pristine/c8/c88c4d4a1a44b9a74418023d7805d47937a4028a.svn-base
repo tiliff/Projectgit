@@ -1,0 +1,127 @@
+#include <MyGLWindow.h>
+#include <Qt\qdebug.h>
+#include <glm\glm.hpp>
+#include <gtx\transform.hpp>
+#include <gtc\matrix_transform.hpp>
+#include <fstream>
+#include <ShapeGenerator.h>
+
+int numIndices;
+
+glm::vec2 translate;
+glm::vec2 velocity;
+float angle=0.0f;
+float angley=0.0f;
+void MyGLWindow::initializeGL()
+{
+	glewInit();
+	glEnable(GL_DEPTH_TEST);
+	sendDataToHardware();
+	CompileShaders();
+	connect(&mytimer,SIGNAL(timeout()),this,SLOT(myUpdate()));
+	mytimer.start(0);
+}
+void MyGLWindow::paintGL()
+{
+glViewport(0,0,width(),height());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+	float depth1=0.0f;
+	glm::mat4 transform=glm::translate(glm::mat4(),glm::vec3(0.0f,0.0f,-3.0f))*glm::rotate(angley,glm::vec3(1.0f,0.0f,0.0f));
+	transform=transform*glm::rotate(angle,glm::vec3(0.0f,0.0f,-1.0f));
+	glm::mat4 projectionmatrix = glm::perspective(90.0f,((float)width()) / height(),0.1f,10.0f);
+	//glm::vec3 dominatingColor(0.2f,0.6f,0.6f);
+	//GLint dominatingColorUniformLocation = glGetUniformLocation(programID,"dominatingColor");
+	GLint translateUniformLocation = glGetUniformLocation(programID,"transform");
+	GLint projectionUniformLocation = glGetUniformLocation(programID,"projectionMat");
+
+	//glUniform3fv(dominatingColorUniformLocation,1,&dominatingColor[0]);
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform[0][0]);
+	glUniformMatrix4fv(projectionUniformLocation, 1, false, &projectionmatrix[0][0]);
+	glDrawElements(GL_TRIANGLES,numIndices,GL_UNSIGNED_SHORT, 0);
+
+}
+void MyGLWindow::sendDataToHardware()
+{
+
+	Neumont::ShapeData cube= Neumont::ShapeGenerator::makeCube();
+	GLuint VertexbufferID;
+	glGenBuffers(1,&VertexbufferID);
+	glBindBuffer(GL_ARRAY_BUFFER,VertexbufferID);
+	glBufferData(GL_ARRAY_BUFFER,cube.vertexBufferSize(), cube.verts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,12*sizeof(float),0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,12*sizeof(float),(void*)(3*sizeof(float)));
+
+	GLuint indexBufferID;
+	glGenBuffers(1,&indexBufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indexBufferID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube.indexBufferSize(),cube.indices,GL_STATIC_DRAW);
+	numIndices=cube.numIndices;
+}
+std::string readShaderCode(const char *fileName)
+{
+	std::ifstream input(fileName);
+
+	if(!input.good())
+	{
+		qDebug() << "File not found" << fileName;
+		exit(1);
+	}
+	return std::string(std::istreambuf_iterator<char>(input),
+		std::istreambuf_iterator<char>());
+}
+void MyGLWindow::CompileShaders()
+{
+	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragShaderID=glCreateShader(GL_FRAGMENT_SHADER);
+	const char* adapter[1];
+	
+	std::string shaderCode= readShaderCode("../shaders/vertexShaderCode.glsl");
+	adapter[0] = shaderCode.c_str();
+	glShaderSource(vertexShaderID,1,adapter,0);
+
+	shaderCode= readShaderCode("../shaders/fragmentShaderCode.glsl");
+	adapter[0] = shaderCode.c_str();
+	glShaderSource(fragShaderID,1,adapter,0);
+
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragShaderID);
+
+	GLint compileStatus;
+	glGetShaderiv(vertexShaderID,GL_COMPILE_STATUS,&compileStatus);
+	if(compileStatus != GL_TRUE)
+	{
+		GLint logLength;
+		glGetShaderiv(vertexShaderID,GL_INFO_LOG_LENGTH, &logLength);
+		char* buffer = new char [logLength];
+		GLsizei bitBucket;
+		glGetShaderInfoLog(vertexShaderID,logLength,&bitBucket,buffer);
+		qDebug() <<buffer;
+		delete [] buffer;
+	}
+
+	programID = glCreateProgram();
+	glAttachShader(programID,vertexShaderID);
+	glAttachShader(programID,fragShaderID);
+
+	glLinkProgram(programID);
+
+	glUseProgram(programID);
+
+	glDeleteShader(vertexShaderID);
+	glDeleteShader(fragShaderID);
+}
+void MyGLWindow::myUpdate()
+{
+
+	
+		angle += 2.0f;
+
+		angley -= 2.0f;
+	
+	paintGL();
+	swapBuffers();
+}

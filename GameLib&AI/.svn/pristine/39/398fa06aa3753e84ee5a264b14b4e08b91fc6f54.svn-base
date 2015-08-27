@@ -1,0 +1,467 @@
+#include <testing.h>
+#include <iostream>
+#include <Engine\Tools\BinaryToShapeLoader.h>
+#include <noise\noise.h>
+
+Neumont::ShapeData makeCube()
+{
+	using glm::vec2;
+	using glm::vec3;
+	using glm::vec4;
+	Neumont::Vertex stackVerts[] = 
+	{
+		// Top
+		vec3(-1.0f, +1.0f, +1.0f), // 0
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, +1.0f, +0.0f), // Normal
+		vec2(+0.0f, +1.0f), // UV
+
+		vec3(+1.0f, +1.0f, +1.0f), // 1
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, +1.0f, +0.0f), // Normal
+		vec2(+1.0f, +1.0f), // UV
+
+		vec3(+1.0f, +1.0f, -1.0f), // 2		
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, +1.0f, +0.0f), // Normal
+		vec2(+1.0f, +0.0f), // UV
+
+		vec3(-1.0f, +1.0f, -1.0f), // 3
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, +1.0f, +0.0f), // Normal
+		vec2(+0.0f, +0.0f), // UV
+
+		// Front
+		vec3(-1.0f, +1.0f, -1.0f), // 4
+		vec4(+1,0,0,0), //Tangent
+		vec3(+0.0f, +0.0f, -1.0f), // Normal
+		vec2(+0.0f, +1.0f), // UV
+
+		vec3(+1.0f, +1.0f, -1.0f), // 5
+		vec4(+1,0,0,0), //Tangent
+		vec3(+0.0f, +0.0f, -1.0f), // Normal
+		vec2(+1.0f, +1.0f), // UV
+
+		vec3(+1.0f, -1.0f, -1.0f), // 6
+		vec4(+1,0,0,0), //Tangent
+		vec3(+0.0f, +0.0f, -1.0f), // Normal
+		vec2(+1.0f, +0.0f), // UV
+
+		vec3(-1.0f, -1.0f, -1.0f), // 7
+		vec4(+1,0,0,0), //Tangent
+		vec3(+0.0f, +0.0f, -1.0f), // Normal
+		vec2(+0.0f, +0.0f), // UV
+
+		// Right
+		vec3(+1.0f, +1.0f, -1.0f), // 8
+		vec4(0,0,-1,0), //Tangent
+		vec3(+1.0f, +0.0f, +0.0f), // Normal
+		vec2(+1.0f, +0.0f), // UV
+
+		vec3(+1.0f, +1.0f, +1.0f), // 9
+		vec4(0,0,-1,0), //Tangent
+		vec3(+1.0f, +0.0f, +0.0f), // Normal
+		vec2(+0.0f, +0.0f), // UV
+
+		vec3(+1.0f, -1.0f, +1.0f), // 10
+		vec4(0,0,-1,0), //Tangent
+		vec3(+1.0f, +0.0f, +0.0f), // Normal
+		vec2(+0.0f, +1.0f), // UV
+
+		vec3(+1.0f, -1.0f, -1.0f), // 11
+		vec4(0,0,-1,0), //Tangent
+		vec3(+1.0f, +0.0f, +0.0f), // Normal
+		vec2(+1.0f, +1.0f), // UV
+
+		// Left
+		vec3(-1.0f, +1.0f, +1.0f), // 12
+		vec4(0,0,1,0), //Tangent
+		vec3(-1.0f, +0.0f, +0.0f), // Normal
+		vec2(+1.0f, +0.0f), // UV
+
+		vec3(-1.0f, +1.0f, -1.0f), // 13
+		vec4(0,0,1,0), //Tangent
+		vec3(-1.0f, +0.0f, +0.0f), // Normal
+		vec2(+0.0f, +0.0f), // UV
+
+		vec3(-1.0f, -1.0f, -1.0f), // 14
+		vec4(0,0,1,0), //Tangent
+		vec3(-1.0f, +0.0f, +0.0f), // Normal
+		vec2(+0.0f, +1.0f), // UV
+
+		vec3(-1.0f, -1.0f, +1.0f), // 15
+		vec4(0,0,1,0), //Tangent
+		vec3(-1.0f, +0.0f, +0.0f), // Normal
+		vec2(+1.0f, +1.0f), // UV
+
+		// Back
+		vec3(+1.0f, +1.0f, +1.0f), // 16
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, +0.0f, +1.0f), // Normal
+		vec2(+1.0f, +0.0f), // UV
+
+		vec3(-1.0f, +1.0f, +1.0f), // 17
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, +0.0f, +1.0f), // Normal
+		vec2(+0.0f, +0.0f), // UV
+
+		vec3(-1.0f, -1.0f, +1.0f), // 18
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, +0.0f, +1.0f), // Normal
+		vec2(+0.0f, +1.0f), // UV
+
+		vec3(+1.0f, -1.0f, +1.0f), // 19
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, +0.0f, +1.0f), // Normal
+		vec2(+1.0f, +1.0f), // UV
+
+		// Bottom
+		vec3(+1.0f, -1.0f, -1.0f), // 20
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, -1.0f, +0.0f), // Normal
+		vec2(+1.0f, +1.0f), // UV
+
+		vec3(-1.0f, -1.0f, -1.0f), // 21
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, -1.0f, +0.0f), // Normal
+		vec2(+0.0f, +1.0f), // UV
+
+		vec3(-1.0f, -1.0f, +1.0f), // 22
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, -1.0f, +0.0f), // Normal
+		vec2(+0.0f, +0.0f), // UV
+
+		vec3(+1.0f, -1.0f, +1.0f), // 23
+		vec4(1,0,0,0), //Tangent
+		vec3(+0.0f, -1.0f, +0.0f), // Normal
+		vec2(+1.0f, +0.0f), // UV
+	};
+	unsigned short stackIndices[] = {
+		0, 1, 2, 0, 2, 3, // Top
+		4, 5, 6, 4, 6, 7, // Front
+		8, 9, 10, 8, 10, 11, // Right 
+		12, 13, 14, 12, 14, 15, // Left
+		16, 17, 18, 16, 18, 19, // Back
+		20, 22, 21, 20, 23, 22, // Bottom
+	};
+
+	Neumont::ShapeData temp;
+
+	temp.numVerts = sizeof(stackVerts) / sizeof(*stackVerts);
+	temp.numIndices = sizeof(stackIndices) / sizeof(*stackIndices); // see above
+
+	temp.indices = new unsigned short[temp.numIndices];
+	memcpy(temp.indices, stackIndices, sizeof(stackIndices));
+
+	temp.verts = new Neumont::Vertex[temp.numVerts];
+	memcpy(temp.verts, stackVerts, sizeof(stackVerts));
+
+	return temp;//copyToShapeData(stackVerts, ARRAY_SIZE(stackVerts), stackIndices, ARRAY_SIZE(stackIndices));
+}
+
+void Testing::init() {
+	myCam.setPos(glm::vec3(-1.40f, 0.82f, -0.45f),glm::vec3(0.41f, -0.29f, -0.01f));
+	finalcolor=glm::vec4(1.0f,1.0f,1.0f,alpha);
+	finalcolor3=glm::vec4(1.0f,1.0f,1.0f,1.0f);
+	finalcolor4=glm::vec4(1.0f,1.0f,1.0f,1.0f);
+	finalcolor5=glm::vec4(1.0f,1.0f,1.0f,1.0f);
+	finalcolor2=glm::vec4(1.0f,1.0f,1.0f,alpha2);
+	diffuseCol = glm::vec3(1.0f, 1.0f, 1.0f);
+	specIntensity=1.0f;
+	discardValue=0.0f;
+	
+
+	
+	
+
+	
+	//place shaders to folder "shaders" in solution directory
+	auto meShader = addShader("./../shaders/vert.glsl","./../shaders/frag.glsl");
+	saveViewTransform(meShader,"viewTransform");
+	auto lightSceneShader = addShader("../shaders/lightedVertShader.glsl", "../shaders/lightedFragShader.glsl");
+	saveViewTransform(lightSceneShader, "viewTransform");
+	auto lightSourceShader = addShader("../shaders/lightVertShader.glsl", "../shaders/lightFragShader.glsl");
+	saveViewTransform(lightSourceShader, "viewTransform");
+	auto tangentLightSceneShader = addShader("../shaders/TanVert.glsl", "../shaders/TanFrag.glsl");
+	saveViewTransform(tangentLightSceneShader, "viewTransform");
+	auto perlinNoiseShader = addShader("../shaders/perlinVert.glsl", "../shaders/perlinFrag.glsl");
+	saveViewTransform(perlinNoiseShader, "viewTransform");
+	auto heightMapShader = addShader("../shaders/perlinHeight.glsl", "../shaders/perlinFrag.glsl");
+	saveViewTransform(heightMapShader, "viewTransform");
+	auto teapotDiscardShader = addShader("../shaders/perlinVert.glsl", "../shaders/teapotDiscard.glsl");
+	saveViewTransform(teapotDiscardShader, "viewTransform");
+	auto reflectionShader=addShader("../shaders/ReflectingShadervert.glsl", "../shaders/ReflectingShaderfrag.glsl");
+	saveViewTransform(reflectionShader, "viewTransform");
+	auto cubemapshader=addShader("../shaders/CubeSkymapvert.glsl", "../shaders/CubeSkymapfrag.glsl");
+	saveViewTransform(cubemapshader, "viewTransform");
+
+	
+	
+
+	// initUVData because sphere's don't have it
+	auto tempGeo = addGeometry(NUShapeEditor::initUVData(Neumont::ShapeGenerator::makePlane(3)),GL_TRIANGLES);
+	auto noiseMap = addGeometry(NUShapeEditor::initUVData(Neumont::ShapeGenerator::makePlane(20)),GL_TRIANGLES);
+	auto heightMap = addGeometry(NUShapeEditor::initUVData(Neumont::ShapeGenerator::makePlane(20)),GL_TRIANGLES);
+	auto tempGeo2= addGeometry(NUShapeEditor::initUVData(Neumont::ShapeGenerator::makeSphere(10)),GL_TRIANGLES);
+	auto tempGeo4= addGeometry(NUShapeEditor::initUVData(Neumont::ShapeGenerator::makeSphere(20)),GL_TRIANGLES);
+	auto tempGeo3= addGeometry(NUShapeEditor::initUVData(Neumont::ShapeGenerator::makeCube()),GL_TRIANGLES);
+	auto tempGeo5= addGeometry((BinaryToShapeLoader::loadFromFile("./Plane.bin")), GL_TRIANGLES);
+	auto tangentcube=addGeometry(makeCube(),GL_TRIANGLES);
+	auto myTeapot = addGeometry(Neumont::ShapeGenerator::makeTeapot(20, glm::mat4()), GL_TRIANGLES);
+
+	// format for textures with folder in solution directory
+	myTexture = addTexture("./../Pics/typhlosion.png");
+	myTexture2 = addTexture("./../Pics/fire.png");
+	myTexture3= addTexture("./../Pics/patter2.png");
+	myTexture4= addTexture("./../Pics/Pattern1.png");
+	myTexture5= addTexture("./../Pics/Shapes.png", false, true);
+	myTexture9= addTexture("./../Pics/Shapes.png");
+	myTexture6=addTexture("./../Pics/Shapes.png");
+	getPerlinNoiseForMap();
+	myTexture7=addCubeTexture("./../Pics/posX.png","./../Pics/negX.png","./../Pics/posY.png","./../Pics/negY.png","./../Pics/posZ.png","./../Pics/negZ.png");
+	myTexture8 =addCubeTexture("./../Pics/Cube/posX.png","./../Pics/Cube/negX.png","./../Pics/Cube/posY.png","./../Pics/Cube/negY.png","./../Pics/Cube/posZ.png","./../Pics/Cube/negZ.png");
+	
+	
+
+
+
+	// when using a NU shape there is no need to define layouts
+	meRenderable = addRenderable(tempGeo,meShader,myTexture);
+	meRenderable2 = addRenderable(tempGeo2,meShader,myTexture2);
+	meRenderable4 = addRenderable(tempGeo4,meShader,myTexture4);
+	meRenderable3 = addRenderable(tempGeo3,meShader,myTexture3);
+	meRenderable5 = addRenderable(tempGeo5,lightSceneShader,myTexture9);
+	meRenderable6= addRenderable(tempGeo3,lightSourceShader,-1);
+	Cubetang = addRenderable(tangentcube,tangentLightSceneShader,myTexture5);
+	Cubetanglight = addRenderable(tempGeo3,lightSourceShader,-1);
+	noisePlane = addRenderable(noiseMap, perlinNoiseShader, myTexture6);
+	heightPlane = addRenderable(heightMap, heightMapShader, myTexture6);
+	dyingTeapot = addRenderable(myTeapot,teapotDiscardShader,myTexture6);
+	Cubemap= addRenderable(tempGeo3,cubemapshader,myTexture7);
+	RefShere=addRenderable(tempGeo4,reflectionShader,myTexture7);
+
+
+	//auto tempGeo2 = addGeometry(NUShapeEditor::initUVData(Neumont::ShapeGenerator::makeSphere(10)),GL_TRIANGLES);
+	//myTexture = addTexture("./../fire.png");
+	//meRenderable = addRenderable(tempGeo2,meShader,myTexture);
+	
+	meRenderable->saveWhereMat("model2WorldTransform"); // really  just a call to addUniformPram
+	meRenderable->saveTexture("myTexture");
+	meRenderable2->saveWhereMat("model2WorldTransform");
+	meRenderable2->saveTexture("myTexture");
+	meRenderable3->saveWhereMat("model2WorldTransform");
+	meRenderable3->saveTexture("myTexture");
+	meRenderable4->saveWhereMat("model2WorldTransform");
+	meRenderable4->saveTexture("myTexture");
+	meRenderable5->saveWhereMat("model2WorldTransform");
+	meRenderable5->saveTexture("myTexture");
+	meRenderable6->saveWhereMat("model2WorldTransform");
+	meRenderable6->saveTexture("myTexture");
+	Cubetang->saveWhereMat("model2WorldTransform");
+	Cubetang->saveTexture("myTexture");
+	Cubetanglight->saveWhereMat("model2WorldTransform");
+	Cubetanglight->saveTexture("myTexture");
+	noisePlane->saveMatrixInfo("model2WorldTransform");
+	noisePlane->saveTexture("myTexture");
+	heightPlane->saveMatrixInfo("model2WorldTransform");
+	heightPlane->saveTexture("myTexture");
+	dyingTeapot->saveMatrixInfo("model2WorldTransform");
+	dyingTeapot->saveTexture("myTexture");
+	Cubemap->saveMatrixInfo("model2WorldTransform");
+	Cubemap->saveTexture("myTexture");
+	RefShere->saveMatrixInfo("model2WorldTransform");
+	RefShere->saveTexture("myTexture");
+
+	meRenderable->addUniformParameter("pureColor",ParameterType::PT_VEC4,&finalcolor3[0]);
+	meRenderable2->addUniformParameter("pureColor",ParameterType::PT_VEC4,&finalcolor4[0]);
+	meRenderable3->addUniformParameter("pureColor",ParameterType::PT_VEC4,&finalcolor[0]);
+	meRenderable4->addUniformParameter("pureColor",ParameterType::PT_VEC4,&finalcolor2[0]);
+	meRenderable6->transformData.scale= glm::vec3(0.02,0.02,0.02);
+	meRenderable6->transformData.position = glm::vec3(0.0f, 0.0f, 1.0f);
+	Cubetang->transformData.scale=glm::vec3(1.0f,1.0f,1.0f);
+	Cubetanglight->transformData.scale=glm::vec3(0.02,0.02,0.02);
+	Cubemap->transformData.scale=glm::vec3(20.0f,20.0f,20.0f);
+	lightSceneShader->saveUniform("diffuseCol", ParameterType::PT_VEC3, &diffuseCol[0]);
+	lightSceneShader->saveUniform("specIntensity", ParameterType::PT_FLOAT, &specIntensity);
+	lightSceneShader->saveUniform("cameraPos", ParameterType::PT_VEC3, &myCam.getPos()[0]);
+	lightSceneShader->saveUniform("lightPos", ParameterType::PT_VEC3, &meRenderable6->transformData.position[0]);
+	tangentLightSceneShader->saveUniform("diffuseCol", ParameterType::PT_VEC3, &diffuseCol[0]);
+	tangentLightSceneShader->saveUniform("specIntensity", ParameterType::PT_FLOAT, &specIntensity);
+	tangentLightSceneShader->saveUniform("cameraPos", ParameterType::PT_VEC3, &myCam.getPos()[0]);
+	tangentLightSceneShader->saveUniform("lightPos", ParameterType::PT_VEC3, &Cubetanglight->transformData.position[0]);
+	tangentLightSceneShader->saveUniform("normalRotationMat", ParameterType::PT_MAT4, &myRotationMat[0][0]);
+	perlinNoiseShader->saveUniform("octaveValues", ParameterType::PT_FLOAT, &octaves);
+	heightMapShader->saveUniform("octaveValues", ParameterType::PT_FLOAT, &octaves);
+	teapotDiscardShader->saveUniform("discardValue", ParameterType::PT_FLOAT, &discardValue);
+	teapotDiscardShader->saveUniform("octaveValues", ParameterType::PT_FLOAT, &octaves);
+	dyingTeapot->transformData.rotation.x = -90.0f;
+	reflectionShader->saveUniform("camPos",ParameterType::PT_VEC3, &myCam.getPos()[0]);
+
+
+
+
+
+	//rotationSpeed = Random::glmRand::randomFloatVectorInBoxRanged(0.0f,145.0f,180.0f);
+	
+	//rotation += rotationSpeed;
+	
+	menu->edit("Is Visible", binaryAlphaVis, "Binary Alpha");
+	menu->edit("Alpha Blending Visible", blendtab , "Alpha Blending");
+	menu->toggleBool("Blending Enabled", isblending,"Alpha Blending");
+	menu->slideFloat("Alpha",alpha,0,1,true,"Alpha Blending");
+	menu->slideFloat("Shape Two Alpha",alpha2,0,1,true,"Alpha Blending");
+	menu->edit("Show Scene", showFlatMap, "Flat Norm Map");
+	menu->edit("Light pos", meRenderable6->transformData.position,-10.0f,10.0f,true,"Flat Norm Map");
+	menu->edit("Show Scene", showTangantCube, "Tangent Space"); 
+	menu->edit("Light pos", Cubetanglight->transformData.position,-10.0f, 10.0f,true,"Tangent Space");
+	menu->edit("Cube Rotation", Cubetang->transformData.rotation, -180.0f, 180.0f, true, "Tangent Space");
+	menu->edit("Show Noise Map", showNoisePlane, "Perlin Noise");
+	menu->edit("Show Height Map", showHeightMap, "Perlin Noise");
+	menu->edit("Octave Values", octaves, 0.0f, 4.0f, true, "Perlin Noise");
+	menu->edit("Show Scene", showDyingTeapot, "Discarding Teapot");
+	menu->edit("Eat Teapot", discardValue, 0.0f, 1.0f, true, "Discarding Teapot");
+	menu->edit("Show Sphere", ShowSphere, "Environment Map");
+	menu->edit("Show Cube Map", ShowCubeMap, "Environment Map");
+	menu->edit("Change Texture", DisplayTexture, "Environment Map");
+
+	
+	
+}
+void Testing::nextFrame(float dt) {
+	//bad hack to update color and rotation every 2 seconds
+	/*static float currentTime = 0;
+	currentTime += dt;
+	if(currentTime > 2) {
+		currentTime = 0;
+		blendColor = Random::glmRand::randomFloatVectorInBox(1,1,1);
+		const int rotSpeedRange = 100;
+		rotationSpeed = Random::glmRand::randomFloatVectorInBoxRanged(rotSpeedRange,rotSpeedRange,rotSpeedRange);
+	}*/
+	static float currentTime = 0;
+	currentTime += dt;
+	if(currentTime > 2)
+	{
+	currentTime=0;
+	const int rotSpeedRange = 10;
+	rotationSpeed = Random::glmRand::randomFloatVectorInBoxRanged(rotSpeedRange,rotSpeedRange,rotSpeedRange);
+	rotationSpeed2 = Random::glmRand::randomFloatVectorInBoxRanged(rotSpeedRange,rotSpeedRange,rotSpeedRange);
+	}
+	rotation2 += rotationSpeed * dt;
+	rotation3 += rotationSpeed2 * dt;
+	//just edit the where matrix for renderables
+
+	meRenderable->visible = binaryAlphaVis;
+	meRenderable2->visible= binaryAlphaVis;
+	meRenderable3->visible= blendtab;
+	meRenderable4->visible= blendtab;
+	meRenderable5->visible= showFlatMap;
+	meRenderable6->visible= showFlatMap;
+	Cubetang->visible=showTangantCube;
+	Cubetanglight->visible=showTangantCube;
+	noisePlane->visible = showNoisePlane;
+	heightPlane->visible = showHeightMap;
+	dyingTeapot->visible = showDyingTeapot;
+	RefShere->visible = ShowSphere;
+	Cubemap->visible = ShowCubeMap;
+	if(DisplayTexture)
+	{
+		Cubemap->textureID=myTexture8;
+		RefShere->textureID=myTexture8;
+	}
+	else if(!DisplayTexture)
+	{
+		Cubemap->textureID=myTexture7;
+		RefShere->textureID=myTexture7;
+	}
+
+	myRotationMat = Cubetang->transformData.genRotMat();
+
+	if(isblending)
+	{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	finalcolor.a=alpha;
+	finalcolor2.a=alpha2;
+	meRenderable->whereMat = glm::rotate(rotation.x,glm::vec3(1,0,0))
+		*= glm::rotate(rotation.y,glm::vec3(0,1,0))
+		*= glm::rotate(rotation.z,glm::vec3(0,0,1));
+	meRenderable2->whereMat = glm::rotate(rotation2.x,glm::vec3(1,0,0))
+		*= glm::rotate(rotation2.y,glm::vec3(0,1,0))
+		*= glm::rotate(rotation2.z,glm::vec3(0,0,1));
+	meRenderable3->whereMat = glm::rotate(rotation2.x,glm::vec3(1,0,0))
+		*= glm::rotate(rotation2.y,glm::vec3(0,1,0))
+		*= glm::rotate(rotation2.z,glm::vec3(0,0,1));
+	meRenderable4->whereMat = glm::rotate(rotation3.x,glm::vec3(1,0,0))
+		*= glm::rotate(rotation3.y,glm::vec3(0,1,0))
+		*= glm::rotate(rotation3.z,glm::vec3(0,0,1));
+	meRenderable5->whereMat =  glm::rotate(90.0f,glm::vec3(1,0,0))*glm::mat4(1);
+	meRenderable6->whereMat = glm::translate(meRenderable6->transformData.position)* glm::scale(meRenderable6->transformData.scale);
+	Cubetang->whereMat= glm::rotate(myRotationMat,1.0f,glm::vec3(1.0f,1.0f,1.0f)) * glm::translate(Cubetang->transformData.position) * glm::scale(Cubetang->transformData.scale);
+	Cubetanglight->whereMat=glm::translate(Cubetanglight->transformData.position)* glm::scale(Cubetanglight->transformData.scale);
+	noisePlane->whereMat = glm::mat4(1);
+	heightPlane->whereMat = glm::mat4(1);
+	dyingTeapot->whereMat = glm::rotate(glm::mat4(1),dyingTeapot->transformData.rotation.x,glm::vec3(1.0f,0.0f,0.0f));
+	Cubemap->whereMat = glm::mat4(1) * glm::scale(Cubemap->transformData.scale);
+	RefShere->whereMat = glm::mat4(1);
+
+}
+void Testing::getPerlinNoiseForMap()
+{
+	int width = 128;
+	int height = 128;
+	noise::module::Perlin perlinNoise;
+
+	// Base frequency for octave 1.
+	perlinNoise.SetFrequency(2.0);
+	GLubyte *data = new GLubyte[ width * height * 4 ];
+	double xRange = 1.0;
+	double yRange = 1.0;
+	double xFactor = xRange / width;
+	double yFactor = yRange / height;
+	for( int oct = 0; oct < 4; oct++ ) 
+	{
+		perlinNoise.SetOctaveCount(oct+1);
+		for( int i = 0; i < width; i++ ) 
+		{
+			for( int j = 0 ; j < height; j++ ) 
+			{
+				double x = xFactor * i;
+				double y = yFactor * j;
+				double z = 0.0;
+
+				float val = 0.0f;
+				double a, b, c, d;
+
+				a = perlinNoise.GetValue(x ,y ,z);
+				b = perlinNoise.GetValue(x+xRange,y ,z);
+				c = perlinNoise.GetValue(x ,y+yRange,z);
+				d = perlinNoise.GetValue(x+xRange,y+yRange,z);
+
+				double xmix = 1.0 - x / xRange;
+				double ymix = 1.0 - y / yRange;
+				double x1 = glm::mix( a, b, xmix );
+				double x2 = glm::mix( c, d, xmix );
+				val = glm::mix(x1, x2, ymix );
+
+				// Scale to roughly between 0 and 1
+				val = (val + 1.0f) * 0.5f;
+
+				// Clamp strictly between 0 and 1
+				val = val> 1.0 ? 1.0 :val;
+				val = val< 0.0 ? 0.0 :val;
+
+				// Store in texture
+				data[((j * width + i) * 4) + oct] = (GLubyte) ( val * 255.0f );
+			}
+		}
+	}
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA, GL_UNSIGNED_BYTE,data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	delete [] data;
+}

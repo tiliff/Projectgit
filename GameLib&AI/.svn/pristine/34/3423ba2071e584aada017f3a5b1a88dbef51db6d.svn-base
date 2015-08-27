@@ -1,0 +1,37 @@
+#pragma once
+
+#include <Engine\BasicGui.h>
+#include <ShapeGenerator.h>
+#include <Engine\WidgetRenderer.h>
+#include <Engine\Tools\NUShapeEditor.h> // VERY handy tools for editing NU shapes
+#include <Engine\Tools\Random\Glm.h> // includes all random from myRandom + glm randomness
+
+#include <glm\gtx\transform.hpp>
+
+class Testing : public WidgetRenderer {
+public:
+	glm::vec3 rotation;
+	glm::vec3 rotation2;
+	glm::vec3 rotation3;
+	bool binaryAlphaVis;
+	bool blendtab;
+	bool isblending;
+	float alpha;
+
+	glm::vec3 rotationSpeed;
+	glm::vec3 rotationSpeed2;
+
+	glm::vec3 blendColor;
+	int myTexture;
+	int myTexture2;
+	int myTexture3;
+	int myTexture4;
+
+	Renderable * meRenderable;
+	Renderable * meRenderable2;
+	Renderable * meRenderable3;
+	Renderable * meRenderable4;
+
+	void init();
+	void nextFrame(float dt);
+};

@@ -1,0 +1,108 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace EntityFrameworkContact
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        static int IDNum=0;
+        public MainWindow()
+        {
+            InitializeComponent();
+            refreshContact();
+        }
+
+        private void removeContact_Click(object sender, RoutedEventArgs e)
+        {
+            using (masterEntities dc = new masterEntities())
+            {
+                Contact c = (Contact)Contactdatagrid.SelectedItem;
+                if (c != null)
+                {
+                    var contact = dc.Contacts.Where(d => d.Id == c.Id).FirstOrDefault();
+                    dc.Contacts.Remove(contact);
+                    dc.SaveChanges();
+                }
+            }
+            refreshContact();
+        }
+        private void refreshContact()
+        {
+            var contacts = new List<Contact>();
+            using (masterEntities dc = new masterEntities())
+            {
+                contacts = dc.Contacts.OrderBy(contact => contact.Id).ToList();
+            }
+
+            Contactdatagrid.ItemsSource = contacts;
+        }
+        private void addCotnact_Click(object sender, RoutedEventArgs e)
+        {
+            using (masterEntities cl = new masterEntities())
+            {
+                Contact c = new Contact { Id = IDNum++, Name =Namecon.Text, Number = Numbers.Text, NumType = NumType.Text, Email = Email.Text,EmailType=EType.Text,Affiliation= Groups.Text };
+                cl.Contacts.Add(c);
+                cl.SaveChanges();
+            }
+            refreshContact();
+        }
+
+
+        private void Groups_FocusableChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            using (masterEntities cl = new masterEntities())
+            {
+                Contact c = (Contact)Contactdatagrid.SelectedItem;
+                if (c != null)
+                {
+                    var contact = cl.Contacts.Where(d => d.Id == c.Id).FirstOrDefault();
+                    int tempid = contact.Id;
+                    contact.Name = Namecon.Text;
+                    contact.Number = Numbers.Text; contact.
+                    NumType = NumType.Text;
+                    contact.Email = Email.Text;
+                    contact.EmailType = EType.Text;
+                    contact.Affiliation = Groups.Text;
+                    cl.SaveChanges();
+                }
+                refreshContact();
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            using (masterEntities cl = new masterEntities())
+            {
+                Contact c = (Contact)Contactdatagrid.SelectedItem;
+                if (c != null)
+                {
+                    var contact = cl.Contacts.Where(d => d.Id == c.Id).FirstOrDefault();
+                    int tempid = contact.Id;
+                    contact.Name = Namecon.Text;
+                    contact.Number = Numbers.Text; contact.
+                    NumType = NumType.Text;
+                    contact.Email = Email.Text;
+                    contact.EmailType = EType.Text;
+                    contact.Affiliation = Groups.Text;
+                    cl.SaveChanges();
+                }
+                refreshContact();
+            }
+        }
+    }
+}

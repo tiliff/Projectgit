@@ -1,0 +1,15 @@
+#include "Qt\qapplication.h"
+//#include "VelocityAcceleration.h"
+#include "MyWidge.h"
+#include "Forces.h"
+int main(int args,char* argv[])
+{
+	QApplication app(args,argv);
+	/*MyWidge wid;
+	wid.show();*/
+	Forces f;
+	f.initialize();
+	f.show();
+
+	return app.exec();
+}

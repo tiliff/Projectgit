@@ -1,0 +1,124 @@
+#pragma once
+#include <GL\glew.h>
+#include <QtOpenGL\qglwidget>
+#include "glm\glm.hpp"
+#include <fstream>
+#include <string>
+#include "Qt\qdebug.h"
+
+#define BYTES_IN_MEGABYTE 1048576;
+class GeneralGlWindow : public QGLWidget
+{
+	const static GLuint MAX_BUFFERS=10;
+	const static GLuint MAX_GEOMETRIES=10;
+	const static GLuint MAX_RENDERABLES=10;
+	const static GLuint MAX_SHADERS=10;
+	const static GLuint MAX_UNIFORM_PARAMETERS=10;
+	const static GLuint MAX_STREAMED_PARAMETERS=10;
+public:
+	enum ParameterType
+	{
+		// These values matter:
+		PT_FLOAT = sizeof(float) * 1,
+		PT_VEC2 = sizeof(float) * 2,
+		PT_VEC3 = sizeof(float) * 3,
+		PT_VEC4 = sizeof(float) * 4,
+		PT_MAT3 = sizeof(float) * 9,
+		PT_MAT4 = sizeof(float) *16,
+	};
+
+	struct Renderable
+	{
+		uint whatGeometryIndex;
+		uint howShaderIndex;
+		glm::mat4 where;
+		bool visible;
+		uint textureID;
+	private:
+		friend class GeneralGlWindow;
+		//GLuint numUniformParameters;
+		//ShaderUniformParameter uniformParameters[MAX_UNIFORM_PARAMETERS];
+	};
+
+	struct BufferInfo
+	{
+		GLuint glBufferID;
+		GLuint remainingSize;
+	}meBufferInfos[MAX_BUFFERS];
+
+public:
+	struct GeometryInfo
+	{
+		GLuint vertexArrayID;
+		GLuint numIndices;
+		BufferInfo* buffer;
+		GLuint ByteOffset;
+		GLuint indexingMode;
+	}GeometryInfos[MAX_GEOMETRIES];
+
+	struct ShaderInfo
+	{
+     GLuint programID;
+	}shaderInfos[MAX_SHADERS];
+
+	/*struct TextureInfo
+	{
+	}textureInfos[10];*/
+
+	class RenderableInfo
+	{
+		GeometryInfo* whatGeometry;
+		glm::mat4 whereMatrix;
+		ShaderInfo* howShaders;
+		bool visible;
+		friend class GeneralGlWindow;
+		//TextureInfo* texture;
+	}RenderableInfos[MAX_RENDERABLES];
+
+	GeneralGlWindow()
+	{
+		glGenBuffers(10,&meBufferInfos[0].glBufferID);
+
+		for(int i=0;i<10;i++)
+		{
+		meBufferInfos[i].remainingSize=BYTES_IN_MEGABYTE;
+		glBindBuffer(GL_ARRAY_BUFFER,meBufferInfos[i].glBufferID);
+		glBufferData(GL_ARRAY_BUFFER,meBufferInfos[i].remainingSize,0,GL_STATIC_DRAW);
+		}
+		
+	}
+	~GeneralGlWindow()
+	{
+
+	};
+
+	GeometryInfo* addGeometry(
+		const void* verts, GLuint vertexDataSize, 
+		ushort* indices, uint numIndices,
+		GLuint indexingMode);
+
+	ShaderInfo* createShaderInfo(
+		const char* vertexShaderFileName,
+		const char* fragmentShaderFileName);
+
+	RenderableInfo* addRenderable(
+		GeometryInfo* whatGeometry,
+		const glm::mat4& whereMatrix,
+		ShaderInfo* howShaders);
+
+	uint addShaderStreamedParameter(
+		GeometryInfo* geometry,
+		uint layoutLocation, 
+		GeneralGlWindow::ParameterType parameterType,
+		uint bufferOffset,
+		uint bufferStride);
+
+	uint addRenderableUniformParameter(
+		Renderable* renderable,
+		const char* name,
+		GeneralGlWindow::ParameterType parameterType, 
+		const float* value);
+
+	
+	//uint addTexture(const char* fileName);
+};

@@ -1,0 +1,12 @@
+#include "MyGLWindow.h"
+#include <Qt\qapplication.h>
+#include <QtGui\qwidget.h>
+
+int main(int argc,char* argv[])
+{
+	QApplication app(argc,argv);
+	MyGLWindow widg;
+	widg.show();
+	widg.resize(500,500);
+	return app.exec();
+}

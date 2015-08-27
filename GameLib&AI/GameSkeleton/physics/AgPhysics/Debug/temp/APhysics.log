@@ -1,0 +1,45 @@
+﻿Build started 5/22/2015 9:39:38 AM.
+     1>Project "C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\APhysics.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\..\MiddleWare\PhysicsGui\Include" /I"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\..\MiddleWare\Qt\Include" /I"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\..\MiddleWare\glm" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\temp\\" /Fd"Debug\temp\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Mainer.cpp
+         Mainer.cpp
+     1>c:\users\tiliff\desktop\gamelib&ai\gameskeleton\testai\agphysics\lab12\angularvelocitylab.h(8): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\Debug\APhysics.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\..\MiddleWare\PhysicsGui\lib" /LIBPATH:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\..\MiddleWare\glew\lib" /LIBPATH:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\..\MiddleWare\Qt\lib" /LIBPATH:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\..\MiddleWare\glm" PhysicsGui.lib QtCored4.lib QtGuid4.lib QtOpenGLd4.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\Debug\APhysics.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\Debug\APhysics.lib" /MACHINE:X86 Debug\temp\AngularSystem.obj
+         Debug\temp\AngularSystemWidge.obj
+         Debug\temp\RestingContacts.obj
+         Debug\temp\restingContactsWidg.obj
+         Debug\temp\AngularVelocityLab.obj
+         Debug\temp\AngularVelocityWidge.obj
+         Debug\temp\FaccumWidge.obj
+         Debug\temp\Forces.obj
+         Debug\temp\KeyForce.obj
+         Debug\temp\DragForces.obj
+         Debug\temp\DragWidg.obj
+         Debug\temp\MultiSpringForces.obj
+         Debug\temp\MultiSpringWidg.obj
+         Debug\temp\CollisionSolo.obj
+         Debug\temp\soloCollisionWidg.obj
+         Debug\temp\RestingContact.obj
+         Debug\temp\restingContactWidg.obj
+         Debug\temp\ParticleContacts.obj
+         Debug\temp\ParticleContact.obj
+         Debug\temp\ParticleSpring.obj
+         Debug\temp\SpringForces.obj
+         Debug\temp\SpringWidg.obj
+         Debug\temp\ParticleDrag.obj
+         Debug\temp\ParticleForceRegistry.obj
+         Debug\temp\ParticleGravity.obj
+         Debug\temp\DebugSlider.obj
+         Debug\temp\Mainer.obj
+         Debug\temp\MeParticleDemo.obj
+         Debug\temp\moc_DebugSlider.obj
+         Debug\temp\Momentum.obj
+         Debug\temp\MyWidge.obj
+         Debug\temp\Particle.obj
+         APhysics.vcxproj -> C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\Debug\APhysics.exe
+     1>Done Building Project "C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\TestAI\AgPhysics\APhysics.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.85

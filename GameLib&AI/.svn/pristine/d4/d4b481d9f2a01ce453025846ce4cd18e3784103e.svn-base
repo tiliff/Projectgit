@@ -1,0 +1,26 @@
+#version 400
+	
+	//in vec4 decolor;
+	in vec3 thePosition;
+	in vec3 theNormal;
+	out vec4 finalColor;
+
+	uniform vec3 dominatingColor;
+	uniform vec3 ambientLight;
+	uniform vec3 lightPos;
+	uniform mat3 normalMat;
+	uniform vec3 diffuseColor;
+
+	void main()
+	{
+	//vec3 lightvec = normalize(lightPos-thePosition);
+	//float lightdot= dot(lightvec,theNormal);
+	//finalColor=vec4(lightdot,lightdot,lightdot,1);
+	 //finalColor = decolor;
+
+	vec3 lightvec = normalize(lightPos-thePosition);
+	vec3 normalVector= normalize(normalMat * theNormal);
+	float lightdot= max(dot(lightvec,normalVector),0.0);
+	vec3 difColor=diffuseColor*lightdot;
+	finalColor=vec4((ambientLight + difColor) * dominatingColor,1);
+	}

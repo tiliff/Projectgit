@@ -1,0 +1,21 @@
+﻿Build started 9/4/2014 11:03:55 PM.
+     1>Project "C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\Renderer.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\..\MiddleWare\Qt\include" /I"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\..\MiddleWare\NeumontTools\include" /I"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\..\MiddleWare\glew\include" /I"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\..\MiddleWare\glm" /I"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\\" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt MyGLWindow.cpp
+         MyGLWindow.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\Debug\Renderer.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\..\MiddleWare\NeumontTools\lib" /LIBPATH:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\..\MiddleWare\Qt\lib" /LIBPATH:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\..\MiddleWare\glew\lib" opengl32.lib glew32d.lib QtOpenGLd4.lib QtGuid4.lib QtCored4.lib NeumontTools.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\Debug\Renderer.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\Debug\Renderer.lib" /MACHINE:X86 Debug\Camera.obj
+         Debug\DebugMenu.obj
+         Debug\DebugSlider.obj
+         Debug\DebugSlider_moc.obj
+         Debug\Mainer.obj
+         Debug\MyGLWindow.obj
+         Debug\MyGLWindow_moc.obj
+         Debug\Renderer.obj
+         Debug\SliderWidget.obj
+         Renderer.vcxproj -> C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\Debug\Renderer.exe
+     1>Done Building Project "C:\Users\tiliff\Desktop\GameLib&AI\GameSkeleton\Renderer\Renderer.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.21

@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Generics
+{
+    public class Stack <T>
+    {
+        public Stack(int initcapacity=50)
+        {
+            data= new T[50];
+            count = 0;
+        }
+
+        public void push(T item)
+        {
+            data[count++] = item;
+        }
+        public T pop()
+        {
+            return data[--count];
+        }
+        public int Length
+        {
+            get { return count; }
+        }
+        private T[] data;
+        private int count;
+    }
+}

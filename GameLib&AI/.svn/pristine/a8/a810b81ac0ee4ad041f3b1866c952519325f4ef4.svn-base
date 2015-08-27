@@ -1,0 +1,9 @@
+#include "MyDebugMenu.h"
+#define debugMenu MyDebugMenu::getInstance()
+
+MyDebugMenu MyDebugMenu::theInstance;
+
+void foo()
+{
+	debugMenu.initialize(meVBoxLayout);
+}

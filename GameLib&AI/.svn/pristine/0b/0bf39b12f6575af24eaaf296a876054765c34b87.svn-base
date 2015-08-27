@@ -1,0 +1,28 @@
+#pragma once
+#include "..\PhysicsGui\include\PhysicsGui\GuiBase.h"
+#include "..\PhysicsGui\include\PhysicsGui\VectorGraphic.h"
+#include "Particle.h"
+#include "ParticleGravity.h"
+#include "ParticleForceRegistry.h"
+#include "KeyForce.h"
+
+class Forces : public GuiBase
+{
+	VectorGraphic* keygraphic;
+	VectorGraphic* multiple;
+	VectorGraphic* grav;
+	Particle multip;
+	Particle keyp;
+	Particle gravp;
+	ParticleGravity pg;
+	ParticleForceRegistry pfr;
+	KeyForce kweef;
+protected:
+	void newFrame();
+public:
+	Forces();
+	void initialize();
+	glm::vec3 getUserDirection();
+
+};
+

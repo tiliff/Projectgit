@@ -1,0 +1,11 @@
+#version 400
+	
+	in vec3 decolor;
+	out vec3 finalColor;
+	
+	
+	void main()
+	{
+	 finalColor = decolor;
+	}
+	

@@ -1,0 +1,39 @@
+#include "Qt\qapplication.h"
+#include "VelocityAcceleration.h"
+//Lab2 include
+//#include "MyWidge.h"
+//Lab3
+//#include "Forces.h"
+//lab4
+//#include "DragWidg.h"
+//lab5
+//#include "SpringWidg.h"
+//lab6
+//#include"MultiSpringWidg.h"
+//lab7
+//#include "soloCollisionWidg.h"
+#include "restingContactWidg.h"
+int main(int args,char* argv[])
+{
+	QApplication app(args,argv);
+	//lab2
+	/*MyWidge wid;
+	wid.show();*/
+	//lab3
+	/*Forces f;
+	f.show();*/
+	//lab4
+	/*DragWidg lab4;
+	lab4.show();*/
+	//lab5
+	/*SpringWidg sw;
+	sw.show();*/
+	//lab6
+	/*MultiSpringWidg msw;
+	msw.show();*/
+	/*soloCollisionWidg cw;
+	cw.show();*/
+	restingContact test;
+	test.show();
+	return app.exec();
+}

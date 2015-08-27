@@ -1,0 +1,41 @@
+#include "MyGLWindow.h"
+#include <GL\glew.h>
+#include <glm\glm.hpp>
+#include <ShapeGenerator.h>
+
+void MyGLWindow::initializeGL()
+{
+	glewInit();
+	sendDataToHardware();
+	compileShaders();
+	
+}
+void MyGLWindow::sendDataToHardware()
+{
+	Neumont::ShapeData cube = Neumont::ShapeGenerator::makeCube();
+
+	GLuint bufferID;
+	glGenBuffers(1,&bufferID);
+	glBindBuffer(GL_ARRAY_BUFFER,bufferID);
+	glBufferData(GL_ARRAY_BUFFER,cube.vertexBufferSize()+cube.indexBufferSize(),0,GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER,0,cube.vertexBufferSize(),cube.verts);
+	glBufferSubData(GL_ARRAY_BUFFER,cube.vertexBufferSize(),cube.indexBufferSize(),cube.indices);
+
+	glEnableVertexAttribArray(0);
+	glvertexattr
+
+
+
+}
+void MyGLWindow::compileShaders()
+{
+
+}
+void MyGLWindow::paintGL()
+{
+
+}
+void MyGLWindow::Update()
+{
+
+}

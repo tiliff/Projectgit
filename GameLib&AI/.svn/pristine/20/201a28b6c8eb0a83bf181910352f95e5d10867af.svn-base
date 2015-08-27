@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace GeeB_EntityFramework
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            refresh();
+        }
+
+        private void addDawgButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (masterEntities dc = new masterEntities())
+            {
+                Dawg dog = new Dawg { Breed = randombreed(), Name = randomname() };
+                dc.Dawgs.Add(dog);
+                dc.SaveChanges();
+                
+            }
+            refresh();
+        }
+
+        private void removeDawgButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (masterEntities dc = new masterEntities())
+            {
+                Dawg dog = (Dawg)dawgdatagrid.SelectedItem;
+                if (dog != null)
+                {
+                    var hello = dc.Dawgs.Where(d => d.Id == dog.Id).FirstOrDefault();
+                    dc.Dawgs.Remove(hello);
+                    dc.SaveChanges();
+                }
+            }
+            refresh();
+        }
+        private void refresh()
+        {
+            var dawgs = new List<Dawg>();
+            using (masterEntities dc = new masterEntities())
+            {
+                dawgs = dc.Dawgs.OrderBy(dog => dog.Id).ToList();
+
+            }
+            dawgdatagrid.ItemsSource = dawgs;
+
+        }
+
+        private string randomname()
+        {
+            string[] dog = new string[10] { "Apple", "Potato", "Taco", "JRida", "KLow", "DOG!", "Sauce", "Milo", "dont u even.", "Mr. Krebs" };
+            Random rand = new Random();
+            int name = rand.Next(0, 10);
+            return dog[name];
+        }
+        private string randombreed()
+        {
+            string[] breed = new string[10] { "I DONT CARE", "I LOVE IT.", "YOU SPIN ME ROUNd.", "IM BLUE DABA DEBA DU DA", "Word Crimes!", "I hope you die!", "Sexy and I know it", "A PIZZA HUT A PIZZA HUT KENTUCKY FRIED CHICKEN AND A PIZZA HUT", "MCDONALDS MCDONALDS", "KENTUCKY FRIED CHICKEN AND A PIZZA HUT." };
+            Random rand = new Random();
+            int Breed = rand.Next(0, 10);
+            return breed[Breed];
+        }
+    }
+}

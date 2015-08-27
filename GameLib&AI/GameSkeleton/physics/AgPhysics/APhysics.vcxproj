@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{52C87DC5-E7B9-42AE-B316-5C3ED766DF23}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>APhysics</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(Configuration)\temp\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\MiddleWare\PhysicsGui\Include;$(SolutionDir)..\MiddleWare\Qt\Include;$(SolutionDir)..\MiddleWare\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>PhysicsGui.lib;QtCored4.lib;QtGuid4.lib;QtOpenGLd4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\MiddleWare\PhysicsGui\lib;$(SolutionDir)..\MiddleWare\glew\lib;$(SolutionDir)..\MiddleWare\Qt\lib;$(SolutionDir)..\MiddleWare\glm;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Fun\AngularSystem.cpp" />
+    <ClCompile Include="Fun\AngularSystemWidge.cpp" />
+    <ClCompile Include="Lab10\RestingContacts.cpp" />
+    <ClCompile Include="Lab10\restingContactsWidg.cpp" />
+    <ClCompile Include="Lab12\AngularVelocityLab.cpp" />
+    <ClCompile Include="Lab12\AngularVelocityWidge.cpp" />
+    <ClCompile Include="Lab3\FaccumWidge.cpp" />
+    <ClCompile Include="Lab3\Forces.cpp" />
+    <ClCompile Include="Lab3\KeyForce.cpp" />
+    <ClCompile Include="Lab4\DragForces.cpp" />
+    <ClCompile Include="Lab4\DragWidg.cpp" />
+    <ClCompile Include="Lab6\MultiSpringForces.cpp" />
+    <ClCompile Include="Lab6\MultiSpringWidg.cpp" />
+    <ClCompile Include="Lab7\CollisionSolo.cpp" />
+    <ClCompile Include="Lab7\soloCollisionWidg.cpp" />
+    <ClCompile Include="Lab9\RestingContact.cpp" />
+    <ClCompile Include="Lab9\restingContactWidg.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleContacts.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleContact.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleSpring.cpp" />
+    <ClCompile Include="Lab5\SpringForces.cpp" />
+    <ClCompile Include="Lab5\SpringWidg.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleDrag.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleForceRegistry.cpp" />
+    <ClCompile Include="PhysicsStuff\ParticleGravity.cpp" />
+    <ClCompile Include="PhysicsStuff\DebugSlider.cpp" />
+    <ClCompile Include="Mainer.cpp" />
+    <ClCompile Include="Lab1\MeParticleDemo.cpp" />
+    <ClCompile Include="PhysicsStuff\moc_DebugSlider.cpp" />
+    <ClCompile Include="Lab2\Momentum.cpp" />
+    <ClCompile Include="Lab2\MyWidge.cpp" />
+    <ClCompile Include="PhysicsStuff\Particle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Fun\AngularSystem.h" />
+    <ClInclude Include="Fun\AngularSystemWidge.h" />
+    <ClInclude Include="Lab10\RestingContacts.h" />
+    <ClInclude Include="Lab10\restingContactsWidg.h" />
+    <ClInclude Include="Lab12\AngularVelocityLab.h" />
+    <ClInclude Include="Lab12\AngularVelocityWidge.h" />
+    <ClInclude Include="Lab3\FaccumWidge.h" />
+    <ClInclude Include="Lab3\Forces.h" />
+    <ClInclude Include="Lab3\KeyForce.h" />
+    <ClInclude Include="Lab4\DragForces.h" />
+    <ClInclude Include="Lab4\DragWidg.h" />
+    <ClInclude Include="Lab6\MultiSpringForces.h" />
+    <ClInclude Include="Lab6\MultiSpringWidg.h" />
+    <ClInclude Include="Lab7\CollisionSolo.h" />
+    <ClInclude Include="Lab7\soloCollisionWidg.h" />
+    <ClInclude Include="Lab9\RestingContact.h" />
+    <ClInclude Include="Lab9\restingContactWidg.h" />
+    <ClInclude Include="PhysicsStuff\ParticleContacts.h" />
+    <ClInclude Include="PhysicsStuff\ParticleContact.h" />
+    <ClInclude Include="PhysicsStuff\ParticleSpring.h" />
+    <ClInclude Include="Lab5\SpringForces.h" />
+    <ClInclude Include="Lab5\SpringWidg.h" />
+    <ClInclude Include="PhysicsStuff\ParticleDrag.h" />
+    <ClInclude Include="PhysicsStuff\ParticleForceRegistry.h" />
+    <ClInclude Include="PhysicsStuff\ParticleGravity.h" />
+    <ClInclude Include="PhysicsStuff\DebugSlider.h" />
+    <ClInclude Include="Lab1\MeParticleDemo.h" />
+    <ClInclude Include="Lab2\Momentum.h" />
+    <ClInclude Include="Lab2\MyWidge.h" />
+    <ClInclude Include="PhysicsStuff\Particle.h" />
+    <ClInclude Include="PhysicsStuff\PfGen.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

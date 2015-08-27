@@ -1,0 +1,29 @@
+#pragma once
+#include <QtGui\QtVboxlayout>
+class MyDebugMenu
+{
+	QVBoxLayout meLayout;
+	static MyDebugMenu theInstance;
+
+	MyDebugMenu(){}
+	MyDebugMenu(const MyDebugMenu&);
+	MyDebugMenu& operator=(MyDebugMenu&);
+	struct FloatWatcher
+	{
+    const float* theFloat;
+	Qlabel* theLabel;
+	};
+	QList<FloatWatcher>
+public:
+	static MyDebugMenu& getInstance(){return theInstance}
+	void initialize(QVBoxLayout* melayout)
+	{
+		this -> meLayout=melayout;
+	}
+	void watch(const char* label,const float& theFloat)
+	{
+
+	}
+    void watch(const char* label,const float& theflaot);
+};
+

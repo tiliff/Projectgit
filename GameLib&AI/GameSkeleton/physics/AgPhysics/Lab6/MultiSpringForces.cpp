@@ -1,0 +1,172 @@
+#include "..\Lab6\MultiSpringForces.h"
+
+DebugSlider* springconstm;
+DebugSlider* restlengthm;
+DebugSlider* Drag;
+QCheckBox* gravitating;
+MultiSpringForces::MultiSpringForces(void)
+{
+}
+
+MultiSpringForces::MultiSpringForces(DebugSlider& SpringConst,DebugSlider& rest,DebugSlider& drag,QCheckBox& grav)
+{
+	springconstm=&SpringConst;
+	restlengthm=&rest;
+	Drag=&drag;
+	gravitating=&grav;
+}
+
+void MultiSpringForces::initialize()
+{
+	GuiBase::initialize(false,true);
+	ps1.SpringConstant=4.0f;
+	ps1.restLength=4.0f;
+	ps1=ParticleSpring(&p1,springconstm->value(),restlengthm->value());
+	ps2=ParticleSpring(&p2,springconstm->value(),restlengthm->value());
+	ps3=ParticleSpring(&p3,springconstm->value(),restlengthm->value());
+	ps4=ParticleSpring(&p4,springconstm->value(),restlengthm->value());
+	ps5=ParticleSpring(&p5,springconstm->value(),restlengthm->value());
+	pg=ParticleGravity(glm::vec3(0.0f,-1.0f,0.0f));
+	g1 = addVectorGraphic();
+	g2 = addVectorGraphic();
+	g3 = addVectorGraphic();
+	g4 = addVectorGraphic();
+	g5 = addVectorGraphic();
+	g6 = addVectorGraphic();
+	g1->displayStyle=DS_SQUARE;
+	g1->b=255;
+	g2->g=255;
+	g3->r=255;
+	g4->b=255;
+	g4->g=255;
+	g5->r=255;
+	g5->g=255;
+	g6->b=255;
+	g6->r=255;
+	p1.Damper=Drag->value();
+	p2.Damper=Drag->value();
+	p3.Damper=Drag->value();
+	p4.Damper=Drag->value();
+	p5.Damper=Drag->value();
+	p6.Damper=Drag->value();
+	p1.Position=glm::vec3(-6.0f,0.0f,0.0f);
+	p2.Position=glm::vec3(-4.0f,0.0f,0.0f);
+	p3.Position=glm::vec3(-2.0f,0.0f,0.0f);
+	p4.Position=glm::vec3(0.0f,0.0f,0.0f);
+	p5.Position=glm::vec3(2.0f,0.0f,0.0f);
+	p6.Position=glm::vec3(4.0f,0.0f,0.0f);
+	p1.mass=1.0f;
+	p2.mass=1.0f;
+	p3.mass=1.0f;
+	p4.mass=1.0f;
+	p5.mass=1.0f;
+	p6.mass=1.0f;
+    pfr.add(&p2,&ps1);
+	pfr.add(&p3,&ps2);
+	pfr.add(&p4,&ps3);
+	pfr.add(&p5,&ps4);
+	pfr.add(&p6,&ps5);
+	pfr.add(&p2,&pg);
+	pfr.add(&p3,&pg);
+	pfr.add(&p4,&pg);
+	pfr.add(&p5,&pg);
+	pfr.add(&p6,&pg);
+
+}
+void MultiSpringForces::vectorGraphicMouseDrag(uint vectorGraphicIndex,const glm::vec3& dragDelta)
+{
+	if(vectorGraphicIndex==0)
+	{
+		p1.Position+=dragDelta;
+	}
+	if(vectorGraphicIndex==1)
+	{
+		p2.Position+=dragDelta;
+	}
+	if(vectorGraphicIndex==2)
+	{
+		p3.Position+=dragDelta;
+	}
+	if(vectorGraphicIndex==3)
+	{
+		p4.Position+=dragDelta;
+	}
+	if(vectorGraphicIndex==4)
+	{
+		p5.Position+=dragDelta;
+	}
+	if(vectorGraphicIndex==5)
+	{
+		p5.Position+=dragDelta;
+	}
+}
+void MultiSpringForces::newFrame()
+{
+	if(gravitating->isChecked())
+	{
+	pfr.add(&p2,&pg);
+	pfr.add(&p3,&pg);
+	pfr.add(&p4,&pg);
+	pfr.add(&p5,&pg);
+	pfr.add(&p6,&pg);
+	}
+	else
+	{
+		pfr.remove(&p2,&pg);
+		pfr.remove(&p3,&pg);
+		pfr.remove(&p4,&pg);
+		pfr.remove(&p5,&pg);
+		pfr.remove(&p6,&pg);
+	}
+	ps1=ParticleSpring(&p1,springconstm->value(),restlengthm->value());
+	ps2.SpringConstant=ps1.SpringConstant;
+	ps2.restLength=ps1.restLength;
+	ps3.SpringConstant=ps1.SpringConstant;
+	ps3.restLength=ps1.restLength;
+	ps4.SpringConstant=ps1.SpringConstant;
+	ps4.restLength=ps1.restLength;
+	ps5.SpringConstant=ps1.SpringConstant;
+	ps5.restLength=ps1.restLength;
+	p2.Damper=Drag->value();
+	p3.Damper=Drag->value();
+	p4.Damper=Drag->value();
+	p5.Damper=Drag->value();
+	p6.Damper=Drag->value();
+	pfr.updateForces(dt());
+
+	p1.Acceleration=p1.SumofForces/p1.mass;
+	p1.Velocity=((p1.Velocity) + p1.Acceleration * dt());
+	p1.Position+=p1.Velocity*dt();
+	p1.clearForces();
+
+		p2.Acceleration=p2.SumofForces/p2.mass;
+	p2.Velocity=(p2.Velocity*p2.Damper) + p2.Acceleration * dt();
+	p2.Position+=p2.Velocity*dt();
+	p2.clearForces();
+
+		p3.Acceleration=p3.SumofForces/p3.mass;
+	p3.Velocity=(p3.Velocity*p3.Damper) + p3.Acceleration * dt();
+	p3.Position+=p3.Velocity*dt();
+	p3.clearForces();
+
+		p4.Acceleration=p4.SumofForces/p4.mass;
+	p4.Velocity=(p4.Velocity*p4.Damper) + p4.Acceleration * dt();
+	p4.Position+=p4.Velocity*dt();
+	p4.clearForces();
+
+		p5.Acceleration=p5.SumofForces/p5.mass;
+	p5.Velocity=(p5.Velocity*p5.Damper) + p5.Acceleration * dt();
+	p5.Position+=p5.Velocity*dt();
+	p5.clearForces();
+
+		p6.Acceleration=p6.SumofForces/p6.mass;
+	p6.Velocity=(p6.Velocity*p6.Damper) + p6.Acceleration * dt();
+	p6.Position+=p6.Velocity*dt();
+	p6.clearForces();
+    sync(g1,p1.Position);
+	sync(g2,p2.Position);
+	sync(g3,p3.Position);
+	sync(g4,p4.Position);
+	sync(g5,p5.Position);
+	sync(g6,p6.Position);
+}

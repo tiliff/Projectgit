@@ -1,0 +1,197 @@
+#include "RenderUI.h"
+#include "Engine.h"
+#include "linesforyourreference.h"
+#include "glm\glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+glm::vec2 left;
+glm::vec2 right;
+glm::vec2 result;
+glm::vec2 normalVector;
+glm::vec2 orignalVector;
+glm::vec2 cwPerpendicularVector;
+glm::vec2 ccwPerpendicularVector;
+glm::vec2 Vector1;
+glm::vec2 Vector2;
+glm::vec2 projectionVector;
+glm::vec2 rejectionVector;
+glm::vec2 aVector;
+glm::vec2 bVector;
+glm::vec2 aMinusBVector;
+glm::vec2 aVectorLerpPortion;
+glm::vec2 bVectorLerpPortion;
+glm::vec2 lerpResultVector;
+glm::vec2 Result2;
+glm::vec3 results[5];
+glm::mat3x3 mat;
+glm::mat3x3 matrices[10];
+glm::mat4x4 matrices3[10];
+glm::mat3x3 currentTransform;
+glm::mat4x4 currentTransform3;
+
+
+void MyBasicVectorEquationCallback(const BasicVectorEquationInfo& info)
+{
+	left=info.scalar1* glm::vec2(info.x1, info.y1);
+	right=info.scalar2* glm::vec2(info.x2, info.y2);
+
+	if(info.add)
+	{
+		result = left + right;
+	}
+	else
+	{
+		result = left - right;
+	}
+}
+void MyPerpendicularDataCallback(const PerpendicularData& info)
+{
+	orignalVector=glm::vec2(info.x,info.y);
+	normalVector=glm::normalize(orignalVector);
+	ccwPerpendicularVector=glm::vec2(orignalVector.y,orignalVector.x*-1);
+	cwPerpendicularVector=glm::vec2(ccwPerpendicularVector.x*-1,ccwPerpendicularVector.y*-1);
+}
+void MyDotProductDataCallback(const DotProductData& info)
+{
+	Vector1=glm::vec2(info.v1i,info.v1j);
+	Vector2=glm::vec2(info.v2i,info.v2j);
+	float scalar=glm::dot(Vector1,Vector2);
+	if (info.projectOntoLeftVector)
+	{
+		float prodleng=glm::dot(Vector1,Vector2) / glm::length(Vector1);
+		projectionVector=prodleng * glm::normalize(Vector1);
+		rejectionVector=Vector2-projectionVector;
+	}
+	else
+	{
+		float prodleng=glm::dot(Vector1,Vector2) / glm::length(Vector2);
+		projectionVector=prodleng * glm::normalize(Vector2);
+		rejectionVector=Vector1-projectionVector;
+	}
+
+
+}
+void MyLerpDataCallback(const LerpData& info)
+{
+	aVector=glm::vec2(info.a_i,info.a_j);
+	bVector=glm::vec2(info.b_i,info.b_j);
+	aMinusBVector=bVector -aVector;
+	aVectorLerpPortion=(1-info.beta)*aVector;
+	bVectorLerpPortion=info.beta*bVector;
+	lerpResultVector=aVectorLerpPortion + bVectorLerpPortion;
+}
+void MyLinearTransformationCallback(const LinearTransformationData& data)
+{
+	glm::vec2 victim=glm::vec2(data.v0,data.v1);
+	glm::mat2x2 op(glm::vec2(data.m00,data.m10),glm::vec2(data.m01,data.m11));
+	Result2 = op*victim;
+}
+void MyAffineTransformationCallback(const AffineTransformationData& data)
+{
+	
+	mat[0][0]=data.data[0];
+	mat[0][1]=data.data[1];
+	mat[0][2]=data.data[2];
+	mat[1][0]=data.data[3];
+	mat[1][1]=data.data[4];
+	mat[1][2]=data.data[5];
+	mat[2][0]=data.data[6];
+	mat[2][1]=data.data[7];
+	mat[2][2]=data.data[8];
+	mat=glm::transpose(mat);
+	for(int i=0;i<5;i++)
+	{
+		results[i].x= data.data[i*3+9];
+		results[i].y= data.data[i*3+10];
+		results[i].z= data.data[i*3+11];
+	}
+	for(int i=0;i<5;i++)
+	{
+     results[i]=mat*results[i];
+	}
+}
+
+int maxMatrixIndex=(10);
+
+void MyMatrixTransformationCallback2D(const MatrixTransformData2D& data)
+{
+	if(data.selectedMatrix > maxMatrixIndex)
+	{
+		maxMatrixIndex = data.selectedMatrix;
+	}
+
+	
+
+	glm::mat3x3 translate;
+	translate[0][2]=data.translateX;
+	translate[1][2]=data.translateY;
+	glm::mat3x3 rotater;
+	rotater[0][0]=cos(data.rotate);
+	rotater[0][1]=sin(data.rotate);
+	rotater[1][0]=-sin(data.rotate);
+	rotater[1][1]=cos(data.rotate);
+	glm::mat3x3 Scale;
+	Scale[0][0]=data.scaleX;
+	Scale[1][1]=data.scaleY;
+		
+
+	
+
+	matrices[data.selectedMatrix]= ((translate*rotater)*Scale);
+	currentTransform = glm::mat3x3();
+	for(int i=0;i<maxMatrixIndex;i++)
+	{
+		currentTransform =(currentTransform*matrices[maxMatrixIndex-i-1]);
+	}
+}
+void My3DMatrixCallback(const MatrixTransformData3D& data)
+{
+	if(data.selectedMatrix > maxMatrixIndex)
+	{
+		maxMatrixIndex = data.selectedMatrix;
+	}
+
+	
+
+	glm::mat4x4 translate=glm::translate(glm::mat4(1),glm::vec3(data.translateX,data.translateY,data.translateZ));
+	glm::mat4x4 rotatex= glm::rotate(glm::mat4(1),data.rotateX * 57.2957795f,glm::vec3(1,0,0));
+	glm::mat4x4 rotatey= glm::rotate(glm::mat4(1),data.rotateY * 57.2957795f,glm::vec3(0,1,0));
+	glm::mat4x4 rotatez= glm::rotate(glm::mat4(1),data.rotateZ * 57.2957795f,glm::vec3(0,0,1));
+	glm::mat4 Scale=glm::scale(glm::mat4(1),glm::vec3(data.scaleX,data.scaleY,data.scaleZ));
+
+		
+
+	
+
+	matrices3[data.selectedMatrix]=((((translate*rotatex)*rotatey)*rotatez)*Scale);
+	currentTransform3 = glm::mat4x4();
+	for(int i=0;i<maxMatrixIndex;i++)
+	{
+		currentTransform3 =(currentTransform3*matrices3[maxMatrixIndex-i-1]);
+	}
+}
+
+int main(int argc, char* argv[])
+{
+	Engine::Init();
+
+	RenderUI renderUI;
+
+	renderUI.setBasicVectorEquationData(
+		MyBasicVectorEquationCallback, &left.x, &right.x, &result.x);
+	renderUI.setPerpendicularData(&orignalVector.x,&normalVector.x,&cwPerpendicularVector.x
+		,&ccwPerpendicularVector.x,MyPerpendicularDataCallback);
+	renderUI.setDotProductData(&Vector1.x,
+		&Vector2.x,&projectionVector.x, 
+		&rejectionVector.x,MyDotProductDataCallback);
+	renderUI.setLerpData(&aVector.x,&bVector.x,&aMinusBVector.x,&aVectorLerpPortion.x,&bVectorLerpPortion.x
+		,&lerpResultVector.x,MyLerpDataCallback);
+	renderUI.setLinearTransformationData(&Result2.x,MyLinearTransformationCallback);
+	renderUI.setAffineTransformationData(&results[0].x,
+		MyAffineTransformationCallback);
+
+	renderUI.set2DMatrixVerticesTransformData(&lines[0].x,numLines,reinterpret_cast<float*>(matrices),reinterpret_cast<float*>(&currentTransform), MyMatrixTransformationCallback2D);
+	renderUI.set3DMatrixCallback(reinterpret_cast<float*>(matrices3),reinterpret_cast<float*>(&currentTransform3),&My3DMatrixCallback);
+	if( ! renderUI.initialize(argc, argv))
+		return -1;
+	return renderUI.run();
+}

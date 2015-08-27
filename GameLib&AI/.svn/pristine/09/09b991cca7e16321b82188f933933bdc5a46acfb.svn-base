@@ -1,0 +1,16 @@
+#pragma once
+#include <Qt\qtimer.h>
+#include <QtOpenGL\qglwidget>
+class MyGLWindow : public QGLWidget
+{
+	Q_OBJECT
+public:
+	QTimer myTimer;
+	void initializeGL();
+	void paintGL();
+	void sendDataToHardware();
+	void compileShaders();
+private slots:
+	void Update();
+};
+

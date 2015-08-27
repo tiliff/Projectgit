@@ -1,0 +1,12 @@
+//#include "GlWindow.h"
+#include <Qt\qapplication.h>
+#include <QtGui\qwidget.h>
+#include "SliderWidget.h"
+
+int main(int argc,char* argv[])
+{
+	QApplication app(argc,argv);
+	SliderWidget widg;
+	widg.showMaximized();
+    return app.exec();
+}

@@ -1,0 +1,25 @@
+#pragma once
+#include "DebugSlider.h"
+#include "Qt\qpushbutton.h"
+#include <..\..\MiddleWare\PhysicsGui\include\PhysicsGui\GuiBase.h>
+#include "Particle.h"
+#include <QtGui\qlabel.h>
+#include <QtGui\qcheckbox.h>
+#include "ParticleContact.h"
+class CollisionSolo : public GuiBase
+{
+	
+public:	
+	Particle p1;
+	Particle P2;
+	ParticleContact pc;
+	VectorGraphic* P1g;
+	VectorGraphic* P2g;
+	VectorGraphic* vg1;
+	VectorGraphic* vg2;
+	CollisionSolo();
+	CollisionSolo(DebugSlider &mass1,DebugSlider &mass2,DebugSlider &restitution,DebugSlider &velocity1,DebugSlider &velocity2,QPushButton &reset,QLabel &xVel1,QLabel &xVel2,QLabel &TMoment,QLabel &TKinEn);
+	void initialize();
+	void newFrame();
+};
+

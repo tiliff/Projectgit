@@ -1,0 +1,13 @@
+#pragma once
+#include <GL\glew.h>
+#include <glm\glm.hpp>
+#include <QtOpenGL\qglwidget>
+
+class MyGLWindow : public QGLWidget
+{
+protected:
+	void initializeGL();
+	void paintGL();
+	void sendDataToHardware();
+};
+

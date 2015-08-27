@@ -1,0 +1,10 @@
+#include "Qt\qapplication.h"
+#include "VelocityAcceleration.h"
+int main(int args,char* argv[])
+{
+	QApplication app(args,argv);
+	VelocityAcceleration v;
+	v.initialize();
+	v.show();
+	app.exec();
+}

@@ -1,0 +1,12 @@
+#pragma once
+#include <QtGui\QVBoxLayout>
+#include <QtGui\QHBoxLayout>
+#include "Momentum.h"
+
+
+class MyWidge : public QWidget
+{
+public:
+	MyWidge();
+};
+

@@ -1,0 +1,141 @@
+#include <GL\glew.h>
+#include "MyGLWindow.h"
+#include "ShapeGenerator.h"
+#include <Qt\qdebug.h>
+#include <glm\glm.hpp>
+#include <glm\gtc/matrix_transform.hpp>
+#include "glm\gtx\transform.hpp"
+#include <ShapeGenerator.h>
+using glm::vec3;
+using glm::vec2;
+GLuint programID;
+GLuint numIndices;
+GLuint BufferOffset;
+float angle=0.0f;
+float angley=0.0f;
+
+char* vertexShaderCode =
+	"#version 400\r\n"
+	""
+	"in layout(location=0) vec3 position;"
+	"in layout(location=1) vec3 color;"
+	""
+	"out vec3 decolor;"
+	"uniform mat4 transform;"
+	"uniform mat4 projectionMat;"
+
+	""
+	"void main()"
+	"{"
+	" vec4 v= vec4(position,1.0f);"
+	"vec4 newPosition = projectionMat * transform * v;"
+	""
+	"gl_Position = newPosition;"
+	" decolor=color;"
+	"}";
+char* fragmentShaderCode =
+	"#version 400\r\n"
+	""
+	"in vec3 decolor;"
+	"out vec3 finalColor;"
+	""
+	""
+	"void main()"
+	"{"
+	" finalColor = decolor;"
+	"}";
+void MyGLWindow::initializeGL()
+{
+	glewInit();
+	glEnable(GL_DEPTH_TEST);
+	sendDataToHardware();
+	compileShaders();
+	connect(&myTimer,SIGNAL(timeout()),this,SLOT(Update()));
+	myTimer.start(0);
+}
+void MyGLWindow::paintGL()
+{
+	glViewport(0,0,width(),height());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glm::mat4 transform=glm::translate(glm::mat4(),glm::vec3(0.0f,0.0f,-3.0f))*glm::rotate(angley,vec3(1.0f,0.0f,0.0f));
+	transform=transform*glm::rotate(angle,vec3(0.0f,0.0f,-1.0f));
+	glm::mat4 projectionmatrix = glm::perspective(90.0f,((float)width()) / height(),0.1f,10.0f);
+
+
+	GLint translateUniformLocation = glGetUniformLocation(programID,"transform");
+	GLint projectionUniformLocation = glGetUniformLocation(programID,"projectionMat");
+
+
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform[0][0]);
+	glUniformMatrix4fv(projectionUniformLocation, 1, false, &projectionmatrix[0][0]);
+	glDrawElements(GL_TRIANGLES,numIndices,GL_UNSIGNED_SHORT, 0);
+	
+}
+void MyGLWindow::sendDataToHardware()
+{
+	Neumont::ShapeData Cube= Neumont::ShapeGenerator::makeCube();
+	
+	GLuint VertexbufferID;
+	glGenBuffers(1,&VertexbufferID);
+	glBindBuffer(GL_ARRAY_BUFFER,VertexbufferID);
+	glBufferData(GL_ARRAY_BUFFER,Cube.vertexBufferSize(), Cube.verts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE,12*sizeof(float),0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,12*sizeof(float),(void*)(3*sizeof(float)));
+
+	GLuint indexBufferID;
+	glGenBuffers(1,&indexBufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indexBufferID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, Cube.indexBufferSize(),Cube.indices,GL_STATIC_DRAW);
+
+	numIndices=Cube.numIndices;
+	
+}
+void MyGLWindow::compileShaders()
+{
+	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragShaderID=glCreateShader(GL_FRAGMENT_SHADER);
+
+	const char* adapter[1];
+	adapter[0] = vertexShaderCode;
+	glShaderSource(vertexShaderID,1,adapter,0);
+	adapter[0] = fragmentShaderCode;
+	glShaderSource(fragShaderID,1,adapter,0);
+
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragShaderID);
+
+	GLint compileStatus;
+	glGetShaderiv(vertexShaderID,GL_COMPILE_STATUS,&compileStatus);
+	if(compileStatus != GL_TRUE)
+	{
+		GLint logLength;
+		glGetShaderiv(vertexShaderID,GL_INFO_LOG_LENGTH, &logLength);
+		char* buffer = new char [logLength];
+		GLsizei bitBucket;
+		glGetShaderInfoLog(vertexShaderID,logLength,&bitBucket,buffer);
+		qDebug() <<buffer;
+		delete [] buffer;
+	}
+
+	programID = glCreateProgram();
+	glAttachShader(programID,vertexShaderID);
+	glAttachShader(programID,fragShaderID);
+
+	glLinkProgram(programID);
+
+	glUseProgram(programID);
+
+
+}
+void MyGLWindow::Update()
+{
+	angle +=1.0f;
+	angley-=1.0f;
+	paintGL();
+	swapBuffers();
+}

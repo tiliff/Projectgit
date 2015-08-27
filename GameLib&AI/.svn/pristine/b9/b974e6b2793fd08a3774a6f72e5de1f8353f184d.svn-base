@@ -1,0 +1,149 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+
+
+namespace BinaryConverter
+{
+    
+    class Vec2 
+    { 
+      public float x;
+      public float y;
+      public override bool Equals(object obj)
+      {
+          Vec2 other = obj as Vec2;
+          return Math.Abs(x - other.x) < float.Epsilon && Math.Abs(y - other.y) < float.Epsilon;
+      }
+    }
+    class Vec3 
+    { 
+        public float x; 
+        public float y; 
+        public float z;
+        public override bool Equals(object obj)
+        {
+            Vec3 other = obj as Vec3;
+            return Math.Abs(x - other.x) < float.Epsilon && Math.Abs(y - other.y) < float.Epsilon && Math.Abs(z - other.z) < float.Epsilon;
+        }
+    }
+    class Vertex
+    {
+        public Vec3 Position;
+        public Vec2 TextureCoord;
+        public Vec3 Normal;
+       public Vertex(Vec3 pos,Vec2 uv,Vec3 norm)
+        {
+            Position = pos;
+            TextureCoord = uv;
+            Normal = norm;
+        }
+
+    
+        public override bool Equals(object obj)
+        {
+            Vertex other = obj as Vertex;
+            return Position.Equals(other.Position) && Normal.Equals(other.Normal) && TextureCoord.Equals(other.TextureCoord);
+        }
+    
+        public void Write(BinaryWriter bw)
+        {
+            bw.Write(Position.x);
+            bw.Write(Position.y);
+            bw.Write(Position.z);
+            bw.Write(Normal.x);
+            bw.Write(Normal.y);
+            bw.Write(Normal.z);
+            bw.Write(TextureCoord.x);
+            bw.Write(TextureCoord.y);
+        }
+    }
+     
+    class BinaryConverter
+    {
+        
+        void addIndex(Vertex v)
+         {
+             ushort index = (ushort)vertices.IndexOf(v);
+             if (index == unchecked((ushort)-1))
+             {
+                 vertices.Add(v);
+                 index = (ushort)(vertices.Count - 1);
+             }
+             indices.Add(index);
+         }
+        public void pullData(StreamReader input)
+        {
+            string line;
+           
+            while ((line = input.ReadLine()) != null)
+            {
+                
+                string[] lineParts = line.Split();
+                Vec3 pos;
+                Vec3 norm;
+                Vec2 uv;
+                if (lineParts[0].Equals("v"))
+                {
+                    Vec3 Position = new Vec3 { x = float.Parse(lineParts[1]), y = float.Parse(lineParts[2]), z = float.Parse(lineParts[3]) };
+                    positions.Add(Position);
+                }
+                if (lineParts[0].Equals("vt"))
+                {
+                    Vec2 uvdata = new Vec2 { x = float.Parse(lineParts[1]), y = float.Parse(lineParts[2]) };
+                    uvs.Add(uvdata);
+                }
+                if (lineParts[0].Equals("vn"))
+                {
+                    Vec3 normal = new Vec3 { x = float.Parse(lineParts[1]), y = float.Parse(lineParts[2]), z = float.Parse(lineParts[3]) };
+                    normals.Add(normal);
+                }
+                if (lineParts[0].Equals("f"))
+                {
+                        string[] indice = lineParts;
+                        indices.Add(ushort.Parse((indice[1].ToCharArray()[0].ToString())));
+                        indices.Add(ushort.Parse((indice[2].ToCharArray()[0].ToString())));
+                        indices.Add(ushort.Parse((indice[3].ToCharArray()[0].ToString())));
+                    
+                }
+            }
+        }
+        static List<Vertex> vertices = new List<Vertex>();
+        static List<ushort> indices = new List<ushort>();
+        static List<Vec3> positions = new List<Vec3>();
+        static List<Vec2> uvs = new List<Vec2>();
+        static List<Vec3> normals = new List<Vec3>();
+        static void Main(string[] args)
+        {
+            
+            StreamReader input = new StreamReader("cube.obj");
+            BinaryConverter bc=new BinaryConverter();
+            bc.pullData(input);
+
+
+
+            BinaryWriter bw = new BinaryWriter(File.Open("BinaryFile.bin",FileMode.Create));
+            bw.Write((uint)positions.Count);
+            bw.Write((uint)indices.Count);
+            Console.WriteLine("Num Vertices: " + positions.Count);
+            Console.WriteLine("Num Indices: " + indices.Count);
+            foreach (Vec3 p in positions)
+            {
+                bw.Write(p.x);
+                bw.Write(p.y);
+                bw.Write(p.z);
+                Console.WriteLine("Vertex: " + "(" + p.x + "," + p.y + "," + p.z + ")");
+            }
+            foreach (ushort us in indices)
+            {
+                bw.Write(us);
+                Console.WriteLine("Index: " + us);
+            }
+            bw.Close();
+        }
+    }
+
+}

@@ -1,0 +1,45 @@
+#pragma once
+#include <GL\glew.h>
+#include <QtOpenGL\qglwidget>
+#include <Qt\qtimer.h>
+#include <DebugSlider.h>
+
+class MyGLWindow : public QGLWidget
+{
+	Q_OBJECT 
+	QTimer mytimer;
+	GLuint programID;
+	GLuint bufferID;
+	GLuint indexBufferID;
+    uint torusOffset;
+	uint cubeOffset;
+	uint planeOffset;
+public:
+	MyGLWindow(DebugSlider &sARed,DebugSlider &sAGreen,DebugSlider &sABlue,
+			DebugSlider &sDRed,DebugSlider &sDGreen,DebugSlider &sDBlue,
+			DebugSlider &sSRed,DebugSlider &sSGreen,DebugSlider &sSBlue,
+			DebugSlider &Sx,DebugSlider &Sy,DebugSlider &Sz,DebugSlider &SP);
+	MyGLWindow();
+
+protected:
+	void initializeGL();
+	void paintGL();
+	void sendDataToHardware();
+	void CompileShaders();
+private slots:
+	void myUpdate();
+	DebugSlider*ARed;
+	DebugSlider*AGreen;
+	DebugSlider*ABlue;
+	DebugSlider*DRed;
+	DebugSlider*DGreen;
+	DebugSlider*DBlue;
+	DebugSlider*SRed;
+	DebugSlider*SGreen;
+	DebugSlider*SBlue;
+	DebugSlider*SLx;
+	DebugSlider*SLy;
+	DebugSlider*SLz;
+	DebugSlider*SLpow;
+};
+

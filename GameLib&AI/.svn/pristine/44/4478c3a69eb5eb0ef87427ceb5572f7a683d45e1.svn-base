@@ -1,0 +1,45 @@
+#include "VelocityAcceleration.h"
+#include <Qt\qdebug.h>
+#include "Windows.h"
+void VelocityAcceleration::initialize()
+{
+	GuiBase::initialize(false, true);
+	graphic = addVectorGraphic();
+	velocityGraphic = GuiBase::addVectorGraphic();
+	velocityGraphic->displayStyle =DS_ARROW;
+	velocityGraphic->r=255;
+	graphic->position=position;
+}
+void VelocityAcceleration::newFrame()
+{
+	float acceleration=1.00f;
+	velocity += acceleration *dt() * getUserDirection();
+	position+=velocity *dt();
+	sync(graphic,position);
+	sync(velocityGraphic,velocity,position);
+}
+void VelocityAcceleration::vectorGraphicMouseDrag(uint vectorGraphicIndex,const glm::vec3& dragDelta)
+{
+	position+= dragDelta;
+}
+glm::vec3 VelocityAcceleration::getUserDirection()
+{
+	glm::vec3 ret;
+	if(GetAsyncKeyState(VK_UP))
+	{
+		ret=glm::vec3(0.0f,1.0f,0.0f);
+	}
+	if(GetAsyncKeyState(VK_LEFT))
+	{
+		ret=glm::vec3(-1.0f,0.0f,0.0f);
+	}
+	if(GetAsyncKeyState(VK_DOWN))
+	{
+		ret=glm::vec3(0.0f,-1.0f,0.0f);
+	}
+	if(GetAsyncKeyState(VK_RIGHT))
+	{
+		ret=glm::vec3(1.0f,0.0f,0.0f);
+	}
+	return ret;
+}

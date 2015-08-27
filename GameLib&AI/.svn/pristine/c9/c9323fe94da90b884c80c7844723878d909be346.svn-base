@@ -1,0 +1,24 @@
+#include "MyDebugMenu.h"
+#define debugMenu MyDebugMenu::getInstance()
+
+MyDebugMenu MyDebugMenu::theInstance;
+
+
+void MyDebugMenu::initialize(QVBoxLayout* layout)
+{
+		theInstance.meLayout=layout;
+}
+void MyDebugMenu::watch(const char* label,const float& theFloat)
+{
+	FloatWatcher temp;
+	temp.initialize(label,theFloat);
+	watching.push_back(temp);
+	numWatches++;
+}
+void MyDebugMenu::Update()
+{
+	for(int i =0;i<numWatches;i++)
+	{
+		//watching.at(i).theLabel = watching.at(i).theFloat;
+	}
+}

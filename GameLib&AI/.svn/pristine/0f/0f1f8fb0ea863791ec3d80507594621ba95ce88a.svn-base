@@ -1,0 +1,180 @@
+#include <GL\glew.h>
+#include "GlWindow.h"
+#include "Qt\qdebug.h"
+#include "glm\glm.hpp"
+#include "glm\gtx\transform.hpp"
+using glm::vec3;
+GLuint programID;
+float angle=0.0f;
+float angle2=0.0f;
+char* vertexShaderCode =
+	"#version 400\r\n"
+	""
+	"in layout(location=0) vec2 position;"
+	"in layout(location=1) vec3 color;"
+	""
+	""
+	""
+	""
+	"out vec3 decolor;"
+	"uniform mat4 transform;"
+	"uniform vec3 dominatingColor;"
+	""
+	"void main()"
+	"{"
+	" gl_Position= transform * vec4(position,0,1);"
+	" decolor=dominatingColor;"
+	"}";
+char* fragmentShaderCode =
+	"#version 400\r\n"
+	""
+	"in vec3 decolor;"
+	"out vec3 finalColor;"
+	""
+	""
+	"void main()"
+	"{"
+	" finalColor = decolor;"
+	"}";
+const double PI = 3.14159265358;
+
+glm::vec2 translate;
+glm::vec2 translate2;
+glm::vec2 velocity;
+glm::vec2 velocity2;
+
+void GlWindow::initializeGL()
+{
+	glewInit();
+	sendDataToHardware();
+	compileShaders();
+	connect(&mytimer,SIGNAL(timeout()),this,SLOT(myUpdate()));
+	mytimer.start(0);
+}
+void GlWindow::myUpdate()
+{
+	
+	if(GetAsyncKeyState('W'))
+	{
+		velocity += glm::vec2(glm::vec4(0.0f,0.002f,0,1.0f) * glm::rotate(angle,glm::vec3(0.0f,0.0f,1.0f)));
+	}
+	if(GetAsyncKeyState('S'))
+	{
+		velocity -= glm::vec2(glm::vec4(0.0f,0.002f,0,1.0f) * glm::rotate(angle,glm::vec3(0.0f,0.0f,1.0f)));
+	}
+	if(GetAsyncKeyState('A'))
+	{
+		angle += 5.0f;
+	}
+	if(GetAsyncKeyState('D'))
+	{
+		angle -= 5.0f;
+	}
+	if(GetAsyncKeyState(VK_UP))
+	{
+		velocity2 += glm::vec2(glm::vec4(0.0f,0.002f,0,1.0f) * glm::rotate(angle2,glm::vec3(0.0f,0.0f,1.0f)));
+	}
+	if(GetAsyncKeyState(VK_DOWN))
+	{
+		velocity2 -= glm::vec2(glm::vec4(0.0f,0.002f,0,1.0f) * glm::rotate(angle2,glm::vec3(0.0f,0.0f,1.0f)));
+	}
+	if(GetAsyncKeyState(VK_LEFT))
+	{
+		angle2 -= 5.0f;
+	}
+	if(GetAsyncKeyState(VK_RIGHT))
+	{
+		angle2 += 5.0f;
+	}
+	velocity *= .95;
+	velocity2 *=.95f;
+	translate += velocity;
+	translate2 += velocity2;
+    paintGL();
+	swapBuffers();
+}
+void GlWindow::sendDataToHardware()
+{
+	GLfloat Vertices[]={
+		+0.0f,+0.1f,
+		+1.0f,+0.0f,+0.0f,
+
+		-0.1f,-0.1f,
+		+0.0f,+1.0f,+0.0f,
+
+		+0.1f,-0.1f,
+		+0.0f,+0.0f,+1.0f,
+		
+	};
+
+	GLuint VertexbufferID;
+	glGenBuffers(1,&VertexbufferID);
+	glBindBuffer(GL_ARRAY_BUFFER,VertexbufferID);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0,2,GL_FLOAT, GL_FALSE,5*sizeof(float),0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,5*sizeof(float),(void*)(2*sizeof(float)));
+
+	GLushort indices[] = {0,1,2};
+	GLuint indexBufferID;
+	glGenBuffers(1,&indexBufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indexBufferID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices),indices,GL_STATIC_DRAW);
+}
+void GlWindow::compileShaders()
+{
+	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragShaderID=glCreateShader(GL_FRAGMENT_SHADER);
+
+	const char* adapter[1];
+	adapter[0] = vertexShaderCode;
+	glShaderSource(vertexShaderID,1,adapter,0);
+	adapter[0] = fragmentShaderCode;
+	glShaderSource(fragShaderID,1,adapter,0);
+
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragShaderID);
+
+	GLint compileStatus;
+	glGetShaderiv(vertexShaderID,GL_COMPILE_STATUS,&compileStatus);
+	if(compileStatus != GL_TRUE)
+	{
+		GLint logLength;
+		glGetShaderiv(vertexShaderID,GL_INFO_LOG_LENGTH, &logLength);
+		char* buffer = new char [logLength];
+		GLsizei bitBucket;
+		glGetShaderInfoLog(vertexShaderID,logLength,&bitBucket,buffer);
+		qDebug() <<buffer;
+		delete [] buffer;
+	}
+
+	programID = glCreateProgram();
+	glAttachShader(programID,vertexShaderID);
+	glAttachShader(programID,fragShaderID);
+
+	glLinkProgram(programID);
+
+	glUseProgram(programID);
+
+}
+void GlWindow::paintGL()
+{
+	glViewport(0,0,width(),height());
+	glClear(GL_COLOR_BUFFER_BIT);
+	glm::mat4 transform=glm::translate(glm::vec3(translate.x,translate.y,0.0f))*glm::rotate(angle,vec3(0.0f,0.0f,-1.0f));
+	vec3 dominatingColor(1.0f,0.3f,0.6f);
+	GLint dominatingColorUniformLocation = glGetUniformLocation(programID,"dominatingColor");
+	GLint translateUniformLocation = glGetUniformLocation(programID,"transform");
+	
+	glUniform3fv(dominatingColorUniformLocation,1,&dominatingColor[0]);
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform[0][0]);
+	glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
+
+	dominatingColor=vec3(0.3f,1.0f,0.6f);
+	glm::mat4 transform2=glm::translate(glm::vec3(translate2.x,translate2.y,0.0f))*glm::rotate(angle2,vec3(0.0f,0.0f,-1.0f));
+	glUniform3fv(dominatingColorUniformLocation,1,&dominatingColor[0]);
+	glUniformMatrix4fv(translateUniformLocation, 1, false, &transform2[0][0]);
+	glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_SHORT, 0);
+}

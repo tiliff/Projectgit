@@ -1,0 +1,16 @@
+#include "Particle.h"
+
+void Particle::clearForces()
+{
+	SumofForces=glm::vec3();
+}
+
+void Particle::addForce(const glm::vec3 &v)
+{
+	SumofForces += v;
+}
+
+void Particle::calculateMoment()
+{
+	this->Momentum=this->Velocity*this->mass;
+}
